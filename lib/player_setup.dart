@@ -29,22 +29,50 @@ class PlayerSetupBackdrop extends StatelessWidget {
           ),
         ),
         SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 460),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: constraints.maxHeight > 700 ? 56 : 8),
-                      ...children,
-                    ],
+          child: Column(
+            children: [
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: TextButton.icon(
+                    key: const ValueKey('setup-back'),
+                    onPressed: () => Navigator.maybePop(context),
+                    icon: const BackButtonIcon(),
+                    label: const Text('العودة لاختيار نوع اللعب'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: _setupGold,
+                      backgroundColor: const Color(0xCC09141C),
+                      minimumSize: const Size(48, 48),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 28,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 460),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(
+                              height: constraints.maxHeight > 700 ? 56 : 8,
+                            ),
+                            ...children,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

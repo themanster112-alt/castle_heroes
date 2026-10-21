@@ -8,6 +8,8 @@ import 'package:castle_heroes/question_scroll.dart';
 import 'package:castle_heroes/menu_audio.dart';
 import 'package:castle_heroes/castle_character.dart';
 import 'package:castle_heroes/player_setup.dart';
+import 'package:castle_heroes/helper_announcement.dart';
+import 'package:castle_heroes/online_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,6 +36,248 @@ class FakeRepository extends QuestionRepository {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets(
+    'Leaving a local race requires confirmation and cancel keeps the match',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => CastleRaceScreen(
+                      names: const ['أ'],
+                      ages: const [WarriorAge.child],
+                      repository: FakeRepository(),
+                    ),
+                  ),
+                ),
+                child: const Text('فتح'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('فتح'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('مغادرة المباراة؟'), findsOneWidget);
+      await tester.tap(find.text('متابعة اللعب'));
+      await tester.pumpAndSettle();
+      expect(find.byType(CastleRaceScreen), findsOneWidget);
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('مغادرة'));
+      await tester.pumpAndSettle();
+      expect(find.byType(CastleRaceScreen), findsNothing);
+    },
+  );
+  testWidgets(
+    'Online entry forms fit narrow screens and reject missing profiles',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      for (final join in [false, true]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: OnlineEntryScreen(key: UniqueKey(), join: join),
+          ),
+        );
+        final submit = find.widgetWithText(
+          FilledButton,
+          join ? 'انضمام' : 'إنشاء غرفة',
+        );
+        await tester.ensureVisible(submit);
+        await tester.tap(submit);
+        await tester.pump();
+        expect(find.textContaining('أدخل اسمك وفئتك العمرية'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      }
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+  test('Locked remaining questions do not trap an exhausted turn', () {
+    final game = RaceMatch([
+      [
+        RaceQuestion(
+          id: 'easy',
+          number: 1,
+          text: 'سهل وحيد',
+          options: ['نعم', 'لا'],
+          answer: 0,
+          level: 1,
+        ),
+        RaceQuestion(
+          id: 'hard',
+          number: 2,
+          text: 'صعب مقفل',
+          options: ['نعم', 'لا'],
+          answer: 0,
+          level: 3,
+        ),
+      ],
+      bank(),
+    ]);
+    game.chooseStone(1);
+    game.timeOut();
+    game.nextTurn();
+    game.chooseStone(1);
+    game.submit(0);
+    game.nextTurn();
+    expect(game.team, 0);
+    expect(game.available(3), isNotEmpty);
+    expect(game.hasPlayableQuestion, isFalse);
+    game.skipExhaustedTurn();
+    expect(game.team, 1);
+    expect(game.hasPlayableQuestion, isTrue);
+  });
+  testWidgets(
+    'An early reduced-motion answer does not restart the question timer',
+    (tester) async {
+      final game = RaceMatch([bank()]);
+      game.chooseStone(1);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: QuestionScrollScreen(
+              game: game,
+              names: const ['الأول'],
+              onContinue: () {},
+            ),
+          ),
+        ),
+      );
+      final correct = find.widgetWithText(OutlinedButton, 'صحيح');
+      await tester.ensureVisible(correct);
+      await tester.tap(correct);
+      await tester.pump(const Duration(milliseconds: 1200));
+      await tester.pump(const Duration(seconds: 1));
+      expect(game.answered, isTrue);
+      expect(find.text('الوقت المتبقي: 15 ثانية'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+  testWidgets(
+    'Helper announcement names the player, blocks play and closes automatically',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 640));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      var choices = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () {
+                  choices++;
+                  showHelperAnnouncement(
+                    context,
+                    player: 'أحمد',
+                    helper: 'القذيفة المضاعفة',
+                    asset: 'assets/helpers/cannon_blue.png',
+                  );
+                },
+                child: const Text('تفعيل'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('تفعيل'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('أحمد اختار'), findsOneWidget);
+      expect(find.text('القذيفة المضاعفة'), findsOneWidget);
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pump(const Duration(seconds: 2));
+      expect(find.byKey(const ValueKey('helper-announcement')), findsOneWidget);
+      expect(choices, 1);
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('helper-announcement')), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  for (final answerLoot in [true, false]) {
+    testWidgets(
+      'Loot gets a fresh timer and clear handoff (answer: $answerLoot)',
+      (tester) async {
+        final game = RaceMatch([bank(), bank()]);
+        game.scores[1] = 50;
+        game.chooseStone(1);
+        var returns = 0;
+        await tester.pumpWidget(
+          MaterialApp(
+            home: QuestionScrollScreen(
+              game: game,
+              names: const ['الأول', 'الثاني'],
+              onContinue: () => returns++,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 10));
+        final wrong = find.widgetWithText(OutlinedButton, 'خطأ');
+        await tester.ensureVisible(wrong);
+        await tester.tap(wrong);
+        await tester.pump();
+        expect(game.lootPending, isTrue);
+        expect(find.byKey(const ValueKey('loot-banner')), findsOneWidget);
+        expect(find.text('دورك الآن يا الثاني'), findsOneWidget);
+        expect(find.text('الوقت المتبقي: 15 ثانية'), findsOneWidget);
+        expect(find.text('العودة إلى السباق خلال 3 ثوانٍ'), findsNothing);
+        expect(find.byIcon(Icons.check_circle), findsNothing);
+        expect(tester.widget<OutlinedButton>(wrong).onPressed, isNull);
+        final background = tester.widget<AnimatedContainer>(
+          find.byKey(const ValueKey('loot-background')),
+        );
+        expect(
+          (background.decoration as BoxDecoration).color,
+          const Color(0xCC123D56),
+        );
+        await tester.pump(const Duration(seconds: 4));
+        expect(returns, 0);
+        expect(game.lootPending, isTrue);
+        if (answerLoot) {
+          final correct = find.widgetWithText(OutlinedButton, 'صحيح');
+          await tester.ensureVisible(correct);
+          await tester.tap(correct);
+          await tester.pump();
+          expect(game.lootUsed[1], isTrue);
+          expect(game.scores[1], 60);
+          expect(find.text('رسالة إلى الثاني'), findsOneWidget);
+          expect(
+            tester
+                .widget<CharacterPortrait>(find.byType(CharacterPortrait))
+                .character,
+            CastleCharacter.values[1],
+          );
+          expect(find.text('الثاني اختار'), findsOneWidget);
+          expect(
+            find.byKey(const ValueKey('helper-announcement')),
+            findsOneWidget,
+          );
+          await tester.pump(const Duration(seconds: 3));
+          await tester.pump(const Duration(milliseconds: 400));
+          expect(returns, 0);
+        } else {
+          await tester.pump(const Duration(seconds: 11));
+          expect(game.lootUsed[1], isFalse);
+          expect(game.scores[1], 50);
+        }
+        expect(game.answered, isTrue);
+        expect(game.lootPending, isFalse);
+        expect(returns, 0);
+        await tester.pump(const Duration(seconds: 3));
+        expect(returns, 1);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+  }
   testWidgets('Character selection is independent for each team', (
     tester,
   ) async {

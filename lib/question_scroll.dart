@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'race_game.dart';
 import 'menu_audio.dart';
 import 'castle_character.dart';
+import 'helper_announcement.dart';
 
 /// The question has its own view; its match stays owned by the selection view.
 class QuestionScrollScreen extends StatefulWidget {
@@ -30,12 +31,13 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
     with SingleTickerProviderStateMixin {
   static const ink = Color(0xFF35200D);
   late final AnimationController _entrance;
+  final ScrollController _scrollController = ScrollController();
   int? selected;
+  int? _resultTeam;
   Timer? _timer, _returnTimer;
   int remaining = 15;
   AudioPlayer? _warningPlayer;
-  bool get _urgent =>
-      remaining <= 5 && !widget.game.answered && !widget.game.lootPending;
+  bool get _urgent => remaining <= 5 && !widget.game.answered;
 
   Future<void> _playWarning() async {
     if (GameSound.muted.value) return;
@@ -56,13 +58,16 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
     _returnTimer?.cancel();
     _returnTimer = Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
-      if (widget.game.lootPending) widget.game.declineLoot();
       widget.onContinue();
     });
   }
 
-  void _answer(int option) {
+  Future<void> _answer(int option) async {
+    if (widget.game.answered) return;
+    final stealing = widget.game.lootPending;
+    if (stealing) _timer?.cancel();
     setState(() {
+      _resultTeam = widget.game.answeringTeam;
       selected = option;
       if (widget.game.lootPending) {
         widget.game.stealLoot(option);
@@ -70,7 +75,44 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
         widget.game.submit(option);
       }
     });
-    _finish();
+    if (widget.game.lootPending) {
+      selected = null;
+      remaining = 15;
+      _startTimer();
+      if (_scrollController.hasClients) _scrollController.jumpTo(0);
+    } else {
+      if (stealing) {
+        await showHelperAnnouncement(
+          context,
+          player: widget.names[widget.game.opponent],
+          helper: 'سرقة الغنيمة',
+          asset:
+              'assets/helpers/loot_${widget.game.opponent == 0 ? 'blue' : 'red'}.png',
+        );
+        if (!mounted) return;
+      }
+      _finish();
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _returnTimer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        remaining--;
+        if (remaining == 0) {
+          if (widget.game.lootPending) {
+            widget.game.declineLoot();
+          } else {
+            widget.game.timeOut();
+          }
+        }
+      });
+      if (remaining > 0 && remaining <= 5) unawaited(_playWarning());
+      if (remaining == 0) _finish();
+    });
   }
 
   @override
@@ -83,15 +125,8 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
     )..forward();
     _entrance.addStatusListener((status) {
       if (status != AnimationStatus.completed) return;
-      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!mounted) return;
-        setState(() {
-          remaining--;
-          if (remaining == 0) widget.game.timeOut();
-        });
-        if (remaining > 0 && remaining <= 5) unawaited(_playWarning());
-        if (remaining == 0) _finish();
-      });
+      if (widget.game.answered || (_timer?.isActive ?? false)) return;
+      _startTimer();
     });
   }
 
@@ -101,6 +136,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
     _returnTimer?.cancel();
     GameSound.muted.removeListener(_applyMute);
     _entrance.dispose();
+    _scrollController.dispose();
     unawaited(_warningPlayer?.dispose());
     super.dispose();
   }
@@ -109,6 +145,9 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
   Widget build(BuildContext context) {
     final game = widget.game;
     final question = game.current!;
+    final displayTeam = game.answered
+        ? (_resultTeam ?? game.team)
+        : game.answeringTeam;
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -120,7 +159,13 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
               fit: BoxFit.cover,
               excludeFromSemantics: true,
             ),
-            const ColoredBox(color: Color(0x20000000)),
+            AnimatedContainer(
+              key: const ValueKey('loot-background'),
+              duration: const Duration(milliseconds: 400),
+              color: game.lootPending
+                  ? const Color(0xCC123D56)
+                  : const Color(0x20000000),
+            ),
             SafeArea(
               child: AnimatedBuilder(
                 animation: _entrance,
@@ -152,6 +197,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
                 },
                 child: LayoutBuilder(
                   builder: (context, viewport) => SingleChildScrollView(
+                    controller: _scrollController,
                     key: const ValueKey('question-scroll'),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -195,12 +241,58 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
                                           CrossAxisAlignment.stretch,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
+                                        if (game.lootPending)
+                                          Semantics(
+                                            liveRegion: true,
+                                            child: Container(
+                                              key: const ValueKey(
+                                                'loot-banner',
+                                              ),
+                                              margin: const EdgeInsets.only(
+                                                bottom: 12,
+                                              ),
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF123D56),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                border: Border.all(
+                                                  color: const Color(
+                                                    0xFFEBC76A,
+                                                  ),
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  Image.asset(
+                                                    'assets/helpers/loot_${game.opponent == 0 ? 'blue' : 'red'}.png',
+                                                    height: 64,
+                                                    excludeFromSemantics: true,
+                                                  ),
+                                                  const Text(
+                                                    'سرقة الغنيمة',
+                                                    style: TextStyle(
+                                                      color: Color(0xFFEBC76A),
+                                                      fontSize: 26,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    'دورك الآن يا ${widget.names[game.opponent]}',
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 23,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                         CharacterPortrait(
                                           character:
-                                              widget.characters?[game
-                                                  .answeringTeam] ??
-                                              CastleCharacter.values[game
-                                                      .answeringTeam %
+                                              widget.characters?[displayTeam] ??
+                                              CastleCharacter
+                                                  .values[displayTeam %
                                                   CastleCharacter
                                                       .values
                                                       .length],
@@ -209,7 +301,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
                                         Text(
                                           game.lootPending
                                               ? 'غنيمة المعركة • ${widget.names[game.opponent]}'
-                                              : 'رسالة إلى ${widget.names[game.team]}',
+                                              : 'رسالة إلى ${widget.names[displayTeam]}',
                                           style: const TextStyle(fontSize: 23),
                                         ),
                                         Text(
@@ -363,8 +455,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
                                               ),
                                             ),
                                           ),
-                                        if (game.answered ||
-                                            game.lootPending) ...[
+                                        if (game.answered) ...[
                                           const SizedBox(height: 8),
                                           Text(
                                             game.feedback,

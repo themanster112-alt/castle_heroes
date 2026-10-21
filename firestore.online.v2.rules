@@ -1,0 +1,158 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signed() { return request.auth != null; }
+    match /clocks/{uid} {
+      allow get: if signed() && request.auth.uid == uid;
+      allow create, update: if signed() && request.auth.uid == uid && request.resource.data.keys().hasOnly(['at']) && request.resource.data.at == request.time;
+      allow list, delete: if false;
+    }
+    match /online_catalog/{version} {
+      allow get: if signed();
+      allow list, write: if false;
+      match /questions/{question} { allow get: if signed(); allow list, write: if false; }
+    }
+    match /rooms/{code} {
+      function b() { return resource.data; }
+      function a() { return request.resource.data; }
+      function s() { return b().state; }
+      function n() { return a().state; }
+      function member() { return signed() && (b().players[0].uid == request.auth.uid || (b().players.size() == 2 && b().players[1].uid == request.auth.uid)); }
+      function profile(p) {
+        return p.keys().hasOnly(['uid', 'name', 'age', 'character']) && p.uid is string && p.name is string && p.name.size() > 0 && p.name.size() <= 20 && p.age is int && p.age in [0, 1] && p.character is int && p.character in [0, 1, 2, 3];
+      }
+      function ints(list) { return list is list && list.size() == 2 && list[0] is int && list[1] is int; }
+      function flags(list) { return list is list && list.size() == 2 && list[0] is bool && list[1] is bool; }
+      function typed(state) {
+        // Fully type the initial state. Actions type changed numeric fields and
+        // preserve all other fields, keeping validation within the expression limit.
+        return state.team is int && state.team in [0,1] && state.level is int && state.level >= 0 && state.level <= 3 &&
+          (state.winner == null || (state.winner is int && state.winner in [0,1])) &&
+          (state.wrongOption == null || (state.wrongOption is int && state.wrongOption in [0,1,2])) &&
+          (state.question == null || state.question is string) && state.usedTexts is list &&
+          state.answered is bool && state.cannonArmed is bool && state.surpriseQuestion is bool &&
+          ints(state.scores) && ints(state.easy) && ints(state.medium) && ints(state.hard) &&
+          ints(state.remEasy) && ints(state.remMedium) && ints(state.remHard) && ints(state.surprises) &&
+          flags(state.cannonUsed) && flags(state.lootUsed) && flags(state.surpriseClaimed);
+      }
+      function pair(list, lane, value) { return lane == 0 ? [value, list[1]] : [list[0], value]; }
+      function level(stone) { return stone <= 3 ? 1 : stone <= 9 ? 2 : 3; }
+      function playable(state, lane) { return state.remEasy[lane] > 0 || (state.easy[lane] >= 1 && state.remMedium[lane] > 0) || (state.medium[lane] >= 3 && state.remHard[lane] > 0); }
+      function finished(state) { return state.winner != null || ((state.question == null || state.answered) && !playable(state, 0) && !playable(state, 1)); }
+      function phase(state) { return state.question != null ? (state.answered ? 'result' : state.wrongOption != null ? 'loot' : 'answer') : (finished(state) ? 'finished' : 'choose'); }
+      function unchanged(keys) { return n().diff(s()).affectedKeys().hasOnly(keys); }
+      function e() { return a().events[string(b().revision)]; }
+      function q() { return get(/databases/$(database)/documents/online_catalog/$(a().version)/questions/$(n().question)).data; }
+      function initial() {
+        let d = a(); let state = d.state;
+        let counts = get(/databases/$(database)/documents/online_catalog/$(d.version)).data.counts;
+        let host = counts[string(d.players[0].age)]; let guest = counts[string(d.players[1].age)];
+        return state.keys().hasOnly(['team','scores','easy','medium','hard','cannonUsed','lootUsed','cannonArmed','question','level','wrongOption','usedTexts','remEasy','remMedium','remHard','surprises','surpriseClaimed','surpriseQuestion','winner','answered']) && state.size() == 20 &&
+          state.team == 0 && state.scores == [0,0] && state.easy == [0,0] && state.medium == [0,0] && state.hard == [0,0] &&
+          state.cannonUsed == [false,false] && state.lootUsed == [false,false] && !state.cannonArmed &&
+          state.question == null && state.level == 0 && state.wrongOption == null && state.usedTexts == [] &&
+          state.remEasy == [host.easy,guest.easy] && state.remMedium == [host.medium,guest.medium] && state.remHard == [host.hard,guest.hard] &&
+          state.surprises == [d.seed % 14 + 1,int(d.seed / 14) % 14 + 1] && state.surpriseClaimed == [false,false] &&
+          !state.surpriseQuestion && state.winner == null && !state.answered && typed(state);
+      }
+      function join() {
+        let oldRoom = b(); let nextRoom = a();
+        return oldRoom.protocol == 2 && oldRoom.status == 'waiting' && request.time < oldRoom.createdAt + duration.value(30,'m') &&
+          oldRoom.players.size() == 1 && nextRoom.players.size() == 2 && nextRoom.players[0] == oldRoom.players[0] && profile(nextRoom.players[1]) &&
+          nextRoom.players[1].uid == request.auth.uid && request.auth.uid != oldRoom.players[0].uid &&
+          nextRoom.status == 'playing' && nextRoom.phase == 'choose' && nextRoom.startedAt == request.time && nextRoom.phaseStartedAt == request.time && nextRoom.phaseSeconds is int && nextRoom.phaseSeconds == 60 && initial() &&
+          nextRoom.diff(oldRoom).affectedKeys().hasOnly(['players','status','phase','updatedAt','startedAt','phaseStartedAt','phaseSeconds','state']);
+      }
+      function choose() {
+        let oldRoom = b(); let old = s(); let nextState = n(); let command = e(); let questionData = q();
+        let question = questionData;
+        let host = question.occurrences[string(oldRoom.players[0].age)]; let guest = question.occurrences[string(oldRoom.players[1].age)];
+        return oldRoom.phase == 'choose' && command.value is int && command.value >= 1 && command.value <= 14 && command.question is string && nextState.question == command.question &&
+          question.age == oldRoom.players[old.team].age && question.level == level(command.value) && !(question.text in old.usedTexts) &&
+          (question.level == 1 || (question.level == 2 && old.easy[old.team] >= 1) || (question.level == 3 && old.medium[old.team] >= 3)) &&
+          unchanged(['question','level','usedTexts','remEasy','remMedium','remHard','surpriseQuestion']) && nextState.level is int && nextState.level == question.level &&
+          ints(nextState.remEasy) && ints(nextState.remMedium) && ints(nextState.remHard) &&
+          nextState.usedTexts == old.usedTexts.concat([question.text]) &&
+          nextState.remEasy == [old.remEasy[0]-host.easy,old.remEasy[1]-guest.easy] &&
+          nextState.remMedium == [old.remMedium[0]-host.medium,old.remMedium[1]-guest.medium] &&
+          nextState.remHard == [old.remHard[0]-host.hard,old.remHard[1]-guest.hard] &&
+          nextState.surpriseQuestion == (!old.surpriseClaimed[old.team] && old.surprises[old.team] == command.value);
+      }
+      function cannon() {
+        let oldRoom = b(); let old = s(); let nextState = n();
+        return oldRoom.phase == 'choose' && old.scores[old.team] >= 150 && !old.cannonUsed[old.team] && !old.cannonArmed &&
+          unchanged(['cannonUsed','cannonArmed']) && nextState.cannonArmed && nextState.cannonUsed == pair(old.cannonUsed,old.team,true);
+      }
+      function normalAnswer() {
+        let old = s(); let nextState = n(); let command = e(); let questionData = q();
+        let correct = command.value == questionData.answer;
+        let bonus = correct && old.surpriseQuestion ? 10 : 0;
+        let delta = correct ? old.level*10*(old.cannonArmed ? 2 : 1)+bonus : (old.cannonArmed ? -old.level*10 : 0);
+        let points = old.scores[old.team]+delta < 0 ? 0 : old.scores[old.team]+delta;
+        let other = 1-old.team;
+        return unchanged(['scores','easy','medium','hard','cannonArmed','surpriseClaimed','surpriseQuestion','wrongOption','answered','winner']) &&
+          ints(nextState.scores) && ints(nextState.easy) && ints(nextState.medium) && ints(nextState.hard) &&
+          (nextState.wrongOption == null || nextState.wrongOption is int) && (nextState.winner == null || nextState.winner is int) &&
+          nextState.scores == pair(old.scores,old.team,points) &&
+          nextState.easy == pair(old.easy,old.team,old.easy[old.team]+(old.level == 1 ? 1 : 0)) &&
+          nextState.medium == pair(old.medium,old.team,old.medium[old.team]+(old.level == 2 ? 1 : 0)) &&
+          nextState.hard == pair(old.hard,old.team,old.hard[old.team]+(old.level == 3 ? 1 : 0)) &&
+          !nextState.cannonArmed && !nextState.surpriseQuestion &&
+          nextState.surpriseClaimed == (correct && old.surpriseQuestion ? pair(old.surpriseClaimed,old.team,true) : old.surpriseClaimed) &&
+          nextState.wrongOption == (correct ? null : command.value) && nextState.answered == (correct || old.scores[other] < 50 || old.lootUsed[other]) &&
+          nextState.winner == (points >= 280 ? old.team : null);
+      }
+      function lootAnswer() {
+        let old = s(); let nextState = n(); let command = e(); let questionData = q();
+        let lane = 1-old.team; let points = old.scores[lane]+(command.value == questionData.answer ? old.level*10 : 0);
+        return command.value != old.wrongOption && old.scores[lane] >= 50 && !old.lootUsed[lane] && ints(nextState.scores) && (nextState.winner == null || nextState.winner is int) &&
+          unchanged(['scores','lootUsed','answered','winner']) && nextState.scores == pair(old.scores,lane,points) &&
+          nextState.lootUsed == pair(old.lootUsed,lane,true) && nextState.answered && nextState.winner == (points >= 280 ? lane : null);
+      }
+      function answer() {
+        let oldRoom = b(); let command = e(); return command.value is int && command.value >= 0 && command.value < 3 && ((oldRoom.phase == 'answer' && normalAnswer()) || (oldRoom.phase == 'loot' && lootAnswer())); }
+      function endQuestion() {
+        let nextState = n(); return unchanged(['answered','cannonArmed','surpriseQuestion']) && nextState.answered && !nextState.cannonArmed && !nextState.surpriseQuestion; }
+      function next() {
+        let oldRoom = b(); let old = s(); let nextState = n();
+        return oldRoom.phase == 'result' && unchanged(['team','question','level','wrongOption','answered','cannonArmed','surpriseQuestion']) &&
+          nextState.team is int && nextState.team == (finished(old) ? old.team : 1-old.team) && nextState.question == null && nextState.level is int && nextState.level == 0 && nextState.wrongOption == null && !nextState.answered && !nextState.cannonArmed && !nextState.surpriseQuestion;
+      }
+      function skip() {
+        let oldRoom = b(); let old = s(); let nextState = n(); return oldRoom.phase == 'choose' && !playable(old,old.team) && unchanged(['team','cannonArmed']) && nextState.team is int && nextState.team == 1-old.team && !nextState.cannonArmed; }
+      function action() {
+        let oldRoom = b(); let command = e();
+        let kind = command.kind;
+        return (kind == 'choose' && choose()) || (kind == 'cannon' && cannon()) || (kind == 'answer' && answer()) ||
+          (kind == 'decline' && oldRoom.phase == 'loot' && endQuestion()) || (kind == 'timeout' && oldRoom.phase in ['answer','loot'] && endQuestion()) ||
+          (kind == 'next' && next()) || (kind == 'skip' && skip()) ||
+          (kind == 'forfeit' && oldRoom.phase == 'choose' && unchanged(['winner']) && n().winner is int && n().winner == 1-s().team);
+      }
+      function move() {
+        let oldRoom = b(); let nextRoom = a(); let nextState = n(); let command = e();
+        let automatic = command.kind in ['timeout','next','forfeit'];
+        let seconds = nextRoom.phase in ['answer','loot'] ? 15 : nextRoom.phase == 'choose' ? 60 : nextRoom.phase == 'result' ? (oldRoom.phase == 'loot' && command.kind == 'answer' ? 6 : 3) : 0;
+        return oldRoom.protocol == 2 && oldRoom.status == 'playing' && request.time < oldRoom.startedAt+duration.value(3,'h') &&
+          nextRoom.revision is int && nextRoom.revision == oldRoom.revision+1 && nextRoom.revision <= 2500 && nextRoom.events.size() == oldRoom.events.size()+1 && nextRoom.events.diff(oldRoom.events).affectedKeys().hasOnly([string(oldRoom.revision)]) &&
+          command.keys().hasOnly(command.kind == 'choose' ? ['kind','value','actor','question'] : ['kind','value','actor']) && command.actor is int && command.actor in [0,1] && oldRoom.players[command.actor].uid == request.auth.uid &&
+          (command.kind in ['choose','answer'] ? command.value is int : command.value == null) && nextRoom.phaseSeconds is int &&
+          nextRoom.state.keys().toSet() == oldRoom.state.keys().toSet() &&
+          nextRoom.diff(oldRoom).affectedKeys().hasOnly(['events','revision','phase','turnUid','phaseStartedAt','phaseSeconds','status','state','updatedAt']) &&
+          ((automatic && request.time >= oldRoom.phaseStartedAt+duration.value(oldRoom.phaseSeconds,'s')) || (!automatic && oldRoom.turnUid == request.auth.uid && request.time < oldRoom.phaseStartedAt+duration.value(oldRoom.phaseSeconds,'s'))) &&
+          action() && nextRoom.phase == phase(nextState) && nextRoom.turnUid == oldRoom.players[nextRoom.phase == 'loot' ? 1-nextState.team : nextState.team].uid &&
+          nextRoom.status == (nextRoom.phase == 'finished' ? 'finished' : 'playing') && nextRoom.phaseSeconds == seconds &&
+          nextRoom.phaseStartedAt == (command.kind == 'cannon' ? oldRoom.phaseStartedAt : request.time);
+      }
+      allow get: if signed();
+      allow list, delete: if false;
+      allow create: if signed() && code.matches('^[0-9]{5}$') &&
+        a().keys().hasOnly(['players','status','protocol','version','seed','events','revision','phase','turnUid','createdAt','updatedAt','startedAt','phaseStartedAt','phaseSeconds','state']) &&
+        a().protocol is int && a().protocol == 2 && a().version is string && exists(/databases/$(database)/documents/online_catalog/$(a().version)) &&
+        a().players.size() == 1 && profile(a().players[0]) && a().players[0].uid == request.auth.uid && a().status == 'waiting' && a().phase == 'waiting' && a().turnUid == request.auth.uid &&
+        a().revision is int && a().revision == 0 && a().events == {} && a().seed is int && a().seed >= 0 && a().seed < 2147483648 &&
+        a().createdAt == request.time && a().updatedAt == request.time && a().startedAt == null && a().phaseStartedAt == null && a().phaseSeconds is int && a().phaseSeconds == 0 && a().state == null;
+      allow update: if signed() && a().updatedAt == request.time &&
+        (join() || (member() && b().status == 'playing' && a().revision == b().revision+1 && move()) || (member() && b().status in ['waiting','playing','closed'] && a().status == 'closed' && a().leftBy == request.auth.uid && a().diff(b()).affectedKeys().hasOnly(['status','leftBy','updatedAt'])));
+    }
+  }
+}

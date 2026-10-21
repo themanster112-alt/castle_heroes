@@ -1,0 +1,14 @@
+{
+  "firestore": {"rules": "firestore.online.v2.rules"},
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.online.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{"source": "**", "destination": "/index.html"}],
+    "headers": [
+      {"source": "/index.html", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
+      {"source": "/main.dart.js", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
+      {"source": "/flutter_bootstrap.js", "headers": [{"key": "Cache-Control", "value": "no-cache"}]},
+      {"source": "/flutter.js", "headers": [{"key": "Cache-Control", "value": "no-cache"}]}
+    ]
+  }
+}

@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'race_game.dart';
 import 'menu_audio.dart';
 import 'player_setup.dart';
 import 'castle_character.dart';
+import 'online_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -308,14 +308,18 @@ class _TeamSetupScreenState extends State<TeamSetupScreen> {
   void _openRoomEntry() {
     Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (_) => const RoomEntryScreen()),
+      MaterialPageRoute<void>(
+        builder: (_) => const OnlineEntryScreen(join: true),
+      ),
     );
   }
 
   void _openRoomCreation() {
     Navigator.push(
       context,
-      MaterialPageRoute<void>(builder: (_) => const CreateRoomScreen()),
+      MaterialPageRoute<void>(
+        builder: (_) => const OnlineEntryScreen(join: false),
+      ),
     );
   }
 
@@ -395,205 +399,14 @@ class _TeamSetupScreenState extends State<TeamSetupScreen> {
 
 class CreateRoomScreen extends StatelessWidget {
   const CreateRoomScreen({super.key});
-
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(
-      child: Stack(
-        children: [
-          const Positioned.fill(
-            child: CustomPaint(painter: FantasyScenePainter(showCastle: true)),
-          ),
-          const Positioned.fill(child: ColoredBox(color: Color(0xB308111B))),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: IconButton(
-              tooltip: 'رجوع',
-              onPressed: () {
-                unawaited(MenuAudio.playClick());
-                Navigator.maybePop(context);
-              },
-              icon: const Icon(Icons.arrow_forward, color: gold),
-            ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.add_home, color: gold, size: 62),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'فتح غرفة جديدة',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: gold,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        shadows: [Shadow(color: Colors.black, blurRadius: 10)],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'عند تفعيل الاتصال، سيُنشأ رقم غرفة لتشاركه مع أصدقائك.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 17, height: 1.5),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 28,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xAA17130D),
-                        border: Border.all(color: gold, width: 2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'سيظهر رقم الغرفة هنا',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: gold,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    const Text(
-                      'إنشاء الغرف أونلاين سيتاح بعد ربط خدمة الاتصال.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => const OnlineEntryScreen(join: false);
 }
 
-class RoomEntryScreen extends StatefulWidget {
+class RoomEntryScreen extends StatelessWidget {
   const RoomEntryScreen({super.key});
-
   @override
-  State<RoomEntryScreen> createState() => _RoomEntryScreenState();
-}
-
-class _RoomEntryScreenState extends State<RoomEntryScreen> {
-  final _roomController = TextEditingController();
-
-  @override
-  void dispose() {
-    _roomController.dispose();
-    super.dispose();
-  }
-
-  void _joinRoom() {
-    if (_roomController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('أدخل رقم الغرفة أولًا.')));
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('الدخول إلى الغرف أونلاين سيتاح بعد تفعيل الاتصال.'),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    body: SafeArea(
-      child: Stack(
-        children: [
-          const Positioned.fill(
-            child: CustomPaint(painter: FantasyScenePainter(showCastle: true)),
-          ),
-          const Positioned.fill(child: ColoredBox(color: Color(0xB308111B))),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: IconButton(
-              tooltip: 'رجوع',
-              onPressed: () {
-                unawaited(MenuAudio.playClick());
-                Navigator.maybePop(context);
-              },
-              icon: const Icon(Icons.arrow_forward, color: gold),
-            ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.meeting_room, color: gold, size: 62),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'دخول غرفة أونلاين',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: gold,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        shadows: [Shadow(color: Colors.black, blurRadius: 10)],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'أدخل رقم الغرفة الذي شاركه معك صديقك',
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 22),
-                    TextField(
-                      controller: _roomController,
-                      textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
-                      textDirection: TextDirection.ltr,
-                      maxLength: 8,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: InputDecoration(
-                        hintText: 'رقم الغرفة',
-                        counterText: '',
-                        filled: true,
-                        fillColor: const Color(0xFFD0D0D0),
-                        hintStyle: const TextStyle(color: Colors.white),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    FantasyButton(label: 'دخول الغرفة', onPressed: _joinRoom),
-                    const SizedBox(height: 14),
-                    const Text(
-                      'اللعب عبر الإنترنت قيد التجهيز وسيُفعّل عند ربط الخدمة.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => const OnlineEntryScreen(join: true);
 }
 
 class FantasyButton extends StatelessWidget {
