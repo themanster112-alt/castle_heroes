@@ -1,0 +1,1154 @@
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+import 'question_scroll.dart';
+import 'menu_audio.dart';
+import 'castle_character.dart';
+
+const raceGold = Color(0xFFE9BD66);
+
+enum WarriorAge { child, adult }
+
+class RaceQuestion {
+  final String id, text;
+  final List<String> options;
+  final int answer, number;
+  final int? level;
+  final String? flagUrl;
+  String? get flagAsset {
+    final uri = Uri.tryParse(flagUrl ?? '');
+    if (uri == null) return null;
+    if (uri.host == 'flagcdn.com') {
+      final file = uri.pathSegments.lastOrNull;
+      const bundled = {
+        'ae',
+        'au',
+        'bd',
+        'br',
+        'bt',
+        'ca',
+        'cn',
+        'de',
+        'dz',
+        'eg',
+        'fr',
+        'id',
+        'in',
+        'iq',
+        'it',
+        'jo',
+        'jp',
+        'kr',
+        'lb',
+        'ly',
+        'ma',
+        'no',
+        'pk',
+        'ps',
+        'qa',
+        'ru',
+        'sa',
+        'sd',
+        'sk',
+        'sy',
+        'tn',
+        'tr',
+        'ye',
+      };
+      if (file != null &&
+          file.endsWith('.png') &&
+          bundled.contains(file.substring(0, file.length - 4))) {
+        return 'assets/flags/$file';
+      }
+    }
+    if (uri.host == 'upload.wikimedia.org') {
+      const countries = {
+        'Canada': 'ca',
+        'Egypt': 'eg',
+        'Turkey': 'tr',
+        'Saudi_Arabia': 'sa',
+        'Brazil': 'br',
+        'France': 'fr',
+        'Germany': 'de',
+        'Japan': 'jp',
+        'Tunisia': 'tn',
+        'India': 'in',
+      };
+      final file = uri.pathSegments.lastOrNull;
+      for (final entry in countries.entries) {
+        if (file == 'Flag_of_${entry.key}.svg') {
+          return 'assets/flags/${entry.value}.png';
+        }
+      }
+    }
+    return null;
+  }
+
+  RaceQuestion({
+    required this.id,
+    required this.text,
+    required this.options,
+    required this.answer,
+    required this.number,
+    this.level,
+    this.flagUrl,
+  });
+  factory RaceQuestion.fromJson(Map<String, dynamic> data) => RaceQuestion(
+    id: data['id'].toString(),
+    text: data['question'] as String,
+    options: List<String>.from(data['options'] as List),
+    answer: data['correctOptionIndex'] as int,
+    number: int.parse((data['questionNumber'] ?? data['id']).toString()),
+    flagUrl: data['flagUrl'] as String?,
+    level: int.tryParse('${data['level']}'),
+  );
+  String get normalizedText => text
+      .replaceAll(RegExp(r'[\s\u064B-\u065F\u0640؟?!.,،]'), '')
+      .toLowerCase();
+}
+
+class QuestionBank {
+  final List<RaceQuestion> questions;
+  final bool offline;
+  QuestionBank(this.questions, {this.offline = false});
+}
+
+class QuestionRepository {
+  const QuestionRepository();
+  static String collection(WarriorAge age) =>
+      age == WarriorAge.child ? 'children_questions' : 'adults_questions';
+  Future<QuestionBank> load(WarriorAge age) async {
+    final name = collection(age);
+    try {
+      final questions = <RaceQuestion>[];
+      String? page;
+      do {
+        final uri = Uri.https(
+          'firestore.googleapis.com',
+          '/v1/projects/castle-heroes-20261014/databases/(default)/documents/$name',
+          {'pageSize': '300', 'pageToken': ?page},
+        );
+        final response = await http
+            .get(uri)
+            .timeout(const Duration(seconds: 10));
+        if (response.statusCode != 200) {
+          throw StateError('Firestore ${response.statusCode}');
+        }
+        final body = jsonDecode(response.body) as Map<String, dynamic>;
+        for (final doc in body['documents'] as List? ?? []) {
+          final fields = doc['fields'] as Map<String, dynamic>;
+          dynamic decode(Map<String, dynamic> v) {
+            if (v.containsKey('nullValue')) return null;
+            if (v.containsKey('integerValue')) {
+              return int.parse(v['integerValue'].toString());
+            }
+            if (v.containsKey('arrayValue')) {
+              return (v['arrayValue']['values'] as List)
+                  .map((e) => decode(Map<String, dynamic>.from(e)))
+                  .toList();
+            }
+            return v['stringValue'];
+          }
+
+          questions.add(
+            RaceQuestion.fromJson({
+              'id': (doc['name'] as String).split('/').last,
+              ...fields.map(
+                (key, value) =>
+                    MapEntry(key, decode(Map<String, dynamic>.from(value))),
+              ),
+            }),
+          );
+        }
+        page = body['nextPageToken'] as String?;
+      } while (page != null);
+      if (questions.isEmpty) throw StateError('Empty bank');
+      return QuestionBank(questions);
+    } catch (_) {
+      final data =
+          jsonDecode(await rootBundle.loadString('data/$name.json')) as List;
+      return QuestionBank(
+        data
+            .map((e) => RaceQuestion.fromJson(Map<String, dynamic>.from(e)))
+            .toList(),
+        offline: true,
+      );
+    }
+  }
+}
+
+/// One shared ledger per match, including questions answered incorrectly.
+class RaceMatch {
+  static const stationCount = 14;
+  static const winningScore = 280, unlockScore = 150;
+  static const surpriseBonus = 10;
+  final List<List<RaceQuestion>> banks;
+  final Random random;
+  final usedIds = <String>{}, usedTexts = <String>{};
+  late final List<int> scores, steps;
+  late final List<int> correctAnswers, wrongAnswers, timedOutAnswers;
+  late final List<List<int>> answeredCounts;
+  late final List<bool> unlocked, cannonUsed, lootUsed;
+  late final List<int> surpriseStones;
+  late final List<bool> surpriseClaimed;
+  int? selectedStone;
+  bool surpriseQuestion = false;
+  int team = 0;
+  RaceQuestion? current;
+  int? winner, chosenLevel, wrongOption;
+  bool answered = false, cannonArmed = false, lootPending = false;
+  String feedback = '';
+  int get opponent => (team + 1) % banks.length;
+  int get answeringTeam => lootPending ? opponent : team;
+  int get questionPoints => (chosenLevel ?? 1) * 10;
+
+  RaceMatch(this.banks, {Random? random}) : random = random ?? Random() {
+    answeredCounts = List.generate(banks.length, (_) => List.filled(3, 0));
+    scores = List.filled(banks.length, 0);
+    correctAnswers = List.filled(banks.length, 0);
+    wrongAnswers = List.filled(banks.length, 0);
+    timedOutAnswers = List.filled(banks.length, 0);
+    steps = List.filled(banks.length, 0);
+    unlocked = List.filled(banks.length, false);
+    cannonUsed = List.filled(banks.length, false);
+    lootUsed = List.filled(banks.length, false);
+    surpriseStones = List.generate(
+      banks.length,
+      (_) => this.random.nextInt(stationCount) + 1,
+    );
+    surpriseClaimed = List.filled(banks.length, false);
+    for (final bank in banks) {
+      bank.sort((a, b) => a.number.compareTo(b.number));
+    }
+  }
+
+  int levelOf(int lane, RaceQuestion question) {
+    if (question.level != null) return question.level!.clamp(1, 3);
+    // Older banks have no difficulty metadata; preserve their original order.
+    return min(
+      3,
+      banks[lane].indexOf(question) * 3 ~/ max(1, banks[lane].length) + 1,
+    );
+  }
+
+  List<RaceQuestion> available(int level) => banks[team]
+      .where(
+        (q) =>
+            levelOf(team, q) == level &&
+            !usedIds.contains(q.id) &&
+            !usedTexts.contains(q.normalizedText),
+      )
+      .toList();
+
+  static int stoneLevel(int stone) => stone <= 3
+      ? 1
+      : stone <= 9
+      ? 2
+      : 3;
+  bool levelUnlocked(int level) =>
+      level == 1 ||
+      (level == 2 && answeredCounts[team][0] >= 1) ||
+      (level == 3 && answeredCounts[team][1] >= 3);
+  bool canChooseStone(int stone) =>
+      levelUnlocked(stoneLevel(stone)) &&
+      available(stoneLevel(stone)).isNotEmpty;
+  String? stoneLockReason(int stone) {
+    final level = stoneLevel(stone);
+    if (!levelUnlocked(level)) {
+      if (level == 2) return 'جاوب على سؤال سهل لفتح الأحجار المتوسطة';
+      final remaining = 3 - answeredCounts[team][1];
+      return 'جاوب على $remaining من الأسئلة المتوسطة لفتح الأحجار الصعبة';
+    }
+    if (available(level).isEmpty) return 'انتهت أسئلة هذا المستوى دون تكرار';
+    return null;
+  }
+
+  bool chooseStone(int stone) {
+    if (stone < 1 || stone > stationCount || !canChooseStone(stone)) {
+      return false;
+    }
+    if (!chooseLevel(stoneLevel(stone))) return false;
+    selectedStone = stone;
+    surpriseQuestion = !surpriseClaimed[team] && surpriseStones[team] == stone;
+    return true;
+  }
+
+  bool chooseLevel(int level) {
+    if (!levelUnlocked(level) ||
+        level < 1 ||
+        level > 3 ||
+        current != null ||
+        answered ||
+        winner != null) {
+      return false;
+    }
+    final questions = available(level);
+    if (questions.isEmpty) return false;
+    chosenLevel = level;
+    selectedStone = null;
+    surpriseQuestion = false;
+    current = questions[random.nextInt(questions.length)];
+    usedIds.add(current!.id);
+    usedTexts.add(current!.normalizedText);
+    return true;
+  }
+
+  bool armCannon() {
+    if (winner != null ||
+        answered ||
+        current != null ||
+        !unlocked[team] ||
+        cannonUsed[team] ||
+        cannonArmed) {
+      return false;
+    }
+    cannonArmed = true;
+    cannonUsed[team] = true;
+    return true;
+  }
+
+  void _award(int lane, int delta) {
+    scores[lane] = max(0, scores[lane] + delta);
+    steps[lane] = min(
+      stationCount,
+      scores[lane] * stationCount ~/ winningScore,
+    );
+    if (scores[lane] >= unlockScore) unlocked[lane] = true;
+    if (scores[lane] >= winningScore) winner = lane;
+  }
+
+  bool submit(int option) {
+    if (answered ||
+        lootPending ||
+        current == null ||
+        winner != null ||
+        option < 0 ||
+        option >= current!.options.length) {
+      return false;
+    }
+    answeredCounts[team][chosenLevel! - 1]++;
+    final correct = option == current!.answer;
+    if (correct) {
+      correctAnswers[team]++;
+    } else {
+      wrongAnswers[team]++;
+    }
+    final value = questionPoints * (cannonArmed ? 2 : 1);
+    if (correct) {
+      final bonus = surpriseQuestion ? surpriseBonus : 0;
+      if (surpriseQuestion) surpriseClaimed[team] = true;
+      _award(team, value + bonus);
+      feedback = 'إجابة صحيحة! +$value نقطة';
+      if (bonus > 0) feedback += ' • حجر المفاجأة! +$bonus نقاط إضافية 🎁';
+    } else {
+      wrongOption = option;
+      if (cannonArmed) _award(team, -questionPoints);
+      feedback = cannonArmed
+          ? 'أخطأت القذيفة! خسرت $questionPoints نقطة.'
+          : 'إجابة خاطئة.';
+      lootPending =
+          banks.length > 1 && scores[opponent] >= 50 && !lootUsed[opponent];
+    }
+    answered = !lootPending;
+    cannonArmed = false;
+    surpriseQuestion = false;
+    return correct;
+  }
+
+  void timeOut() {
+    if (answered || current == null) return;
+    if (!lootPending) timedOutAnswers[team]++;
+    lootPending = false;
+    answered = true;
+    cannonArmed = false;
+    surpriseQuestion = false;
+    feedback = 'انتهى الوقت • 0 نقطة';
+  }
+
+  bool stealLoot(int option) {
+    if (!lootPending ||
+        winner != null ||
+        current == null ||
+        option == wrongOption ||
+        option < 0 ||
+        option >= current!.options.length) {
+      return false;
+    }
+    lootUsed[opponent] = true;
+    final correct = option == current!.answer;
+    if (correct) {
+      correctAnswers[opponent]++;
+    } else {
+      wrongAnswers[opponent]++;
+    }
+    if (correct) _award(opponent, questionPoints);
+    feedback = correct
+        ? 'نجحت سرقة الغنيمة! +$questionPoints نقطة للخصم.'
+        : 'فشلت سرقة الغنيمة.';
+    lootPending = false;
+    answered = true;
+    return correct;
+  }
+
+  void declineLoot() {
+    if (!lootPending) return;
+    lootPending = false;
+    answered = true;
+    feedback += ' تم تجاوز الغنيمة.';
+  }
+
+  void nextTurn() {
+    if (!answered || lootPending || winner != null) return;
+    team = (team + 1) % banks.length;
+    current = null;
+    chosenLevel = null;
+    selectedStone = null;
+    surpriseQuestion = false;
+    wrongOption = null;
+    answered = false;
+    cannonArmed = false;
+    feedback = '';
+  }
+
+  void skipExhaustedTurn() {
+    if (current != null ||
+        winner != null ||
+        [1, 2, 3].any((level) => available(level).isNotEmpty)) {
+      return;
+    }
+    answered = true;
+    nextTurn();
+  }
+}
+
+class CastleRaceScreen extends StatefulWidget {
+  final List<String> names;
+  final List<WarriorAge> ages;
+  final QuestionRepository repository;
+  final List<CastleCharacter>? characters;
+  const CastleRaceScreen({
+    super.key,
+    required this.names,
+    required this.ages,
+    this.repository = const QuestionRepository(),
+    this.characters,
+  });
+  @override
+  State<CastleRaceScreen> createState() => _CastleRaceScreenState();
+}
+
+class _CastleRaceScreenState extends State<CastleRaceScreen> {
+  RaceMatch? match;
+  bool offline = false;
+  bool failed = false;
+  int? selected;
+  List<int>? previousSteps, previousScores;
+
+  void _rematch() {
+    final game = match;
+    if (game == null) return;
+    setState(() {
+      previousSteps = null;
+      previousScores = null;
+      match = RaceMatch(
+        game.banks.map((bank) => List<RaceQuestion>.of(bank)).toList(),
+      );
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      match = null;
+      failed = false;
+      selected = null;
+      previousSteps = null;
+      previousScores = null;
+    });
+    try {
+      final loaded = <WarriorAge, QuestionBank>{};
+      for (final age in widget.ages.toSet()) {
+        loaded[age] = await widget.repository.load(age);
+      }
+      if (!mounted) return;
+      setState(() {
+        offline = loaded.values.any((bank) => bank.offline);
+        match = RaceMatch(
+          widget.ages
+              .map((age) => List<RaceQuestion>.of(loaded[age]!.questions))
+              .toList(),
+        );
+      });
+    } catch (_) {
+      if (mounted) setState(() => failed = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final game = match;
+    if (game?.current != null) {
+      return QuestionScrollScreen(
+        key: ValueKey(game!.current),
+        game: game,
+        names: widget.names,
+        characters: widget.characters,
+        onContinue: () => setState(() {
+          if (game.winner != null) {
+            game.current = null;
+          } else {
+            game.nextTurn();
+          }
+        }),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('المسار إلى القلعة'),
+        centerTitle: true,
+        actions: const [SoundToggleButton()],
+      ),
+      body: game == null
+          ? Center(
+              child: failed
+                  ? FilledButton(
+                      onPressed: _load,
+                      child: const Text('تعذّر تحميل الأسئلة • حاول مجددًا'),
+                    )
+                  : const CircularProgressIndicator(),
+            )
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 900),
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    const Text(
+                      'اجمع 280 نقطة للوصول إلى القلعة',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: raceGold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    if (offline)
+                      const Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                          'تلعب بالنسخة المحفوظة من الأسئلة • الاتصال غير متاح',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    if (game.winner != null) ...[
+                      const Icon(Icons.emoji_events, color: raceGold, size: 80),
+                      Text(
+                        '${widget.names[game.winner!]} بطل القلعة!',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: raceGold,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      FilledButton(
+                        onPressed: _rematch,
+                        child: const Text('إعادة المباراة بنفس اللاعبين'),
+                      ),
+                      RaceSummary(
+                        game: game,
+                        names: widget.names,
+                        characters: widget.characters,
+                      ),
+                    ] else if (game.current == null) ...[
+                      Text(
+                        'دور ${widget.names[game.team]} • اضغط على حجر لاختيار السؤال',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: raceGold,
+                          fontFamily: 'Amiri',
+                          fontSize: 24,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      if (game.cannonArmed)
+                        const Card(
+                          color: Color(0xFF5B3A12),
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Text(
+                              '💣 ×2 القذيفة مفعّلة للسؤال القادم',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: raceGold,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Stack(
+                        children: [
+                          RaceBoard(
+                            names: widget.names,
+                            characters: widget.characters,
+                            steps: game.steps,
+                            scores: game.scores,
+                            previousSteps: previousSteps,
+                            previousScores: previousScores,
+                            active: game.team,
+                            canChooseStone: game.canChooseStone,
+                            onStone: (n) {
+                              final reason = game.stoneLockReason(n);
+                              if (reason != null) {
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(
+                                    SnackBar(content: Text(reason)),
+                                  );
+                                return;
+                              }
+                              setState(() {
+                                previousSteps = List.of(game.steps);
+                                previousScores = List.of(game.scores);
+                                game.chooseStone(n);
+                              });
+                            },
+                          ),
+                          for (var lane = 0; lane < widget.names.length; lane++)
+                            Positioned(
+                              top: 12,
+                              left: lane == 0 ? 4 : null,
+                              right: lane == 0 ? null : 4,
+                              child: _PlayerHelpers(
+                                name: widget.names[lane],
+                                blue: lane == 0,
+                                unlocked: game.unlocked[lane],
+                                lootUnlocked: game.scores[lane] >= 50,
+                                cannonUsed: game.cannonUsed[lane],
+                                lootUsed: game.lootUsed[lane],
+                                armed: game.team == lane && game.cannonArmed,
+                                lootAvailable: widget.names.length > 1,
+                                onCannon:
+                                    game.team == lane &&
+                                        game.unlocked[lane] &&
+                                        !game.cannonUsed[lane]
+                                    ? () => setState(() {
+                                        game.armCannon();
+                                      })
+                                    : null,
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if ([
+                        1,
+                        2,
+                        3,
+                      ].every((level) => game.available(level).isEmpty)) ...[
+                        const Text(
+                          'انتهت أسئلة هذا اللاعب دون تكرار.',
+                          textAlign: TextAlign.center,
+                        ),
+                        FilledButton(
+                          onPressed: () => setState(game.skipExhaustedTurn),
+                          child: const Text('تجاوز الدور'),
+                        ),
+                        TextButton(
+                          onPressed: _load,
+                          child: const Text('مباراة جديدة'),
+                        ),
+                      ],
+                    ],
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+class RaceSummary extends StatelessWidget {
+  final RaceMatch game;
+  final List<String> names;
+  final List<CastleCharacter>? characters;
+  const RaceSummary({
+    super.key,
+    required this.game,
+    required this.names,
+    this.characters,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Text(
+        'ملخص السباق',
+        textAlign: TextAlign.center,
+        style: TextStyle(color: raceGold, fontSize: 24),
+      ),
+      for (var lane = 0; lane < names.length; lane++)
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CharacterPortrait(
+                  character:
+                      characters?[lane] ??
+                      CastleCharacter.values[lane %
+                          CastleCharacter.values.length],
+                ),
+                Text(
+                  names[lane],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: raceGold, fontSize: 21),
+                ),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    Text('${game.scores[lane]} نقطة'),
+                    Text('صحيحة: ${game.correctAnswers[lane]}'),
+                    Text('خاطئة: ${game.wrongAnswers[lane]}'),
+                    Text('انتهى الوقت: ${game.timedOutAnswers[lane]}'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
+class RaceBoard extends StatelessWidget {
+  final List<String> names;
+  final List<int> steps;
+  final List<int>? scores;
+  final List<int>? previousSteps, previousScores;
+  final int active;
+  final bool Function(int)? canChooseStone;
+  final ValueChanged<int>? onStone;
+  final List<CastleCharacter>? characters;
+  const RaceBoard({
+    super.key,
+    required this.names,
+    required this.steps,
+    this.scores,
+    this.previousSteps,
+    this.previousScores,
+    required this.active,
+    this.canChooseStone,
+    this.onStone,
+    this.characters,
+  });
+  // Normalized centers of the fourteen platforms, ordered toward the castle.
+  static const leftPlatforms = <Offset>[
+    Offset(.263, .889),
+    Offset(.210, .807),
+    Offset(.232, .740),
+    Offset(.190, .675),
+    Offset(.232, .612),
+    Offset(.175, .547),
+    Offset(.184, .492),
+    Offset(.214, .440),
+    Offset(.261, .391),
+    Offset(.163, .347),
+    Offset(.204, .303),
+    Offset(.266, .264),
+    Offset(.344, .229),
+    Offset(.408, .198),
+  ];
+  static const rightPlatforms = <Offset>[
+    Offset(.753, .889),
+    Offset(.808, .808),
+    Offset(.762, .740),
+    Offset(.812, .675),
+    Offset(.775, .612),
+    Offset(.828, .547),
+    Offset(.827, .492),
+    Offset(.794, .440),
+    Offset(.811, .391),
+    Offset(.852, .347),
+    Offset(.802, .303),
+    Offset(.735, .264),
+    Offset(.677, .229),
+    Offset(.604, .198),
+  ];
+  static Offset position(int lane, double step) {
+    final points = lane == 0 ? leftPlatforms : rightPlatforms;
+    final progress = step.clamp(0.0, RaceMatch.stationCount.toDouble());
+    final index = progress.floor();
+    final start = index == 0 ? Offset(points.first.dx, .95) : points[index - 1];
+    if (index == RaceMatch.stationCount) return start;
+    return Offset.lerp(start, points[index], progress - index)!;
+  }
+
+  @override
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 938 / 1677,
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/backgrounds/question_map.png',
+                  fit: BoxFit.fill,
+                  excludeFromSemantics: true,
+                ),
+              ),
+              for (var lane = 0; lane < names.length; lane++) ...[
+                for (var n = 1; n <= RaceMatch.stationCount; n++)
+                  Positioned(
+                    left: position(lane, n.toDouble()).dx * box.maxWidth - 13,
+                    top: position(lane, n.toDouble()).dy * box.maxHeight - 13,
+                    child: GestureDetector(
+                      key: ValueKey('stone-$lane-$n'),
+                      onTap: lane == active && onStone != null
+                          ? () => onStone!(n)
+                          : null,
+                      child: Opacity(
+                        opacity:
+                            lane == active && !(canChooseStone?.call(n) ?? true)
+                            ? .4
+                            : 1,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: steps[lane] >= n
+                                ? raceGold
+                                : const Color(0xFF26352F),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: raceGold),
+                          ),
+                          child: Text(
+                            '$n',
+                            style: TextStyle(
+                              color: steps[lane] >= n
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 850),
+                  builder: (context, progress, child) {
+                    final reducedMotion = MediaQuery.disableAnimationsOf(
+                      context,
+                    );
+                    final t = reducedMotion ? 1.0 : progress;
+                    final start = previousSteps?[lane] ?? steps[lane];
+                    final step =
+                        start +
+                        (steps[lane] - start) * Curves.easeInOut.transform(t);
+                    final delta =
+                        (scores?[lane] ?? 0) -
+                        (previousScores?[lane] ?? scores?[lane] ?? 0);
+                    final point = position(lane, step);
+                    return Positioned(
+                      left: point.dx * box.maxWidth - 25,
+                      top:
+                          point.dy * box.maxHeight -
+                          65 -
+                          (delta > 0 ? sin(pi * t) * 18 : 0),
+                      child: IgnorePointer(
+                        child: Semantics(
+                          label: '${names[lane]}، المحطة ${steps[lane]} من 14',
+                          child: Container(
+                            width: 50,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color:
+                                  (lane == 0
+                                          ? Colors.blueAccent
+                                          : Colors.redAccent)
+                                      .withValues(alpha: .18),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: lane == 0
+                                    ? Colors.blueAccent
+                                    : Colors.redAccent,
+                                width: 2,
+                              ),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black54, blurRadius: 8),
+                              ],
+                            ),
+                            child: CharacterPortrait(
+                              character:
+                                  characters?[lane] ??
+                                  CastleCharacter.values[lane %
+                                      CastleCharacter.values.length],
+                              size: 60,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                if (scores != null &&
+                    previousScores != null &&
+                    scores![lane] > previousScores![lane])
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 1500),
+                    builder: (context, progress, _) {
+                      final point = position(lane, steps[lane].toDouble());
+                      return Positioned(
+                        left: point.dx * box.maxWidth - 35,
+                        top: point.dy * box.maxHeight - 70 - progress * 30,
+                        child: IgnorePointer(
+                          child: Opacity(
+                            opacity: 1 - progress,
+                            child: Text(
+                              '+${scores![lane] - previousScores![lane]}',
+                              style: const TextStyle(
+                                color: raceGold,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                Positioned(
+                  bottom: 12,
+                  left: lane == 0 ? 8 : box.maxWidth * .52,
+                  width: box.maxWidth * .46,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xDC10192E),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: active == lane ? raceGold : Colors.white24,
+                      ),
+                    ),
+                    child: Text(
+                      '${names[lane]} • ${scores?[lane] ?? 0} نقطة',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+    ),
+  );
+}
+
+class _PlayerHelpers extends StatefulWidget {
+  final String name;
+  final bool blue,
+      unlocked,
+      lootUnlocked,
+      cannonUsed,
+      lootUsed,
+      armed,
+      lootAvailable;
+  final VoidCallback? onCannon;
+  const _PlayerHelpers({
+    required this.name,
+    required this.blue,
+    required this.unlocked,
+    required this.lootUnlocked,
+    required this.cannonUsed,
+    required this.lootUsed,
+    required this.armed,
+    required this.lootAvailable,
+    required this.onCannon,
+  });
+
+  @override
+  State<_PlayerHelpers> createState() => _PlayerHelpersState();
+}
+
+class _PlayerHelpersState extends State<_PlayerHelpers> {
+  bool expanded = false;
+  String get name => widget.name;
+  bool get blue => widget.blue;
+  bool get unlocked => widget.unlocked;
+  bool get cannonUsed => widget.cannonUsed;
+  bool get lootUsed => widget.lootUsed;
+  bool get armed => widget.armed;
+  bool get lootAvailable => widget.lootAvailable;
+  VoidCallback? get onCannon => widget.onCannon;
+  @override
+  Widget build(BuildContext context) {
+    final color = blue ? Colors.lightBlueAccent : Colors.redAccent;
+    final suffix = blue ? 'blue' : 'red';
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      child: ClipRect(
+        child: Align(
+          alignment: blue ? Alignment.centerRight : Alignment.centerLeft,
+          widthFactor: expanded ? 1 : .5,
+          child: SizedBox(
+            width: 74,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    name,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                _helper(
+                  context,
+                  'القذيفة المضاعفة',
+                  'cannon_$suffix',
+                  armed
+                      ? 'مفعّلة'
+                      : cannonUsed
+                      ? 'استُخدمت'
+                      : unlocked
+                      ? 'جاهزة'
+                      : '150 نقطة',
+                  'ضعف نقاط الإجابة الصحيحة، وخسارة قيمة السؤال عند الخطأ. استخدام واحد في دورك.',
+                  color,
+                  unlocked && (!cannonUsed || armed),
+                  onCannon,
+                ),
+                if (lootAvailable)
+                  _helper(
+                    context,
+                    'سرقة الغنيمة',
+                    'loot_$suffix',
+                    lootUsed
+                        ? 'استُخدمت'
+                        : widget.lootUnlocked
+                        ? 'جاهزة'
+                        : '50 نقطة',
+                    'تتاح عند خطأ الخصم بعد جمع 50 نقطة. أجب عن سؤاله لكسب نقاطه. استخدام واحد.',
+                    color,
+                    widget.lootUnlocked && !lootUsed,
+                    null,
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _helper(
+    BuildContext context,
+    String title,
+    String asset,
+    String status,
+    String description,
+    Color color,
+    bool available,
+    VoidCallback? action,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Semantics(
+        label: '$name، $title، $status',
+        button: true,
+        child: Tooltip(
+          message: '$title: $description',
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: !expanded
+                ? () => setState(() => expanded = true)
+                : action ??
+                      () => showDialog<void>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('$title • $status'),
+                          content: Text(description),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('حسنًا'),
+                            ),
+                          ],
+                        ),
+                      ),
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: const Color(0xCB10192E),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: available ? color : Colors.white24),
+              ),
+              child: Column(
+                children: [
+                  Opacity(
+                    opacity: available ? 1 : .4,
+                    child: Image.asset(
+                      'assets/helpers/$asset.png',
+                      width: 62,
+                      height: 62,
+                      fit: BoxFit.contain,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white, fontSize: 11),
+                  ),
+                  Text(
+                    status,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: available ? color : Colors.white60,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
