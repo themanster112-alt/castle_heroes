@@ -37,6 +37,45 @@ class FakeRepository extends QuestionRepository {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   testWidgets(
+    'Difficulty unlocks belong to each player and respect online turn',
+    (tester) async {
+      final game = RaceMatch([bank(), bank()]);
+      int? selected;
+      Future<void> render({bool enabled = true}) => tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: DifficultyPicker(
+              game: game,
+              enabled: enabled,
+              onSelected: (level) => selected = level,
+            ),
+          ),
+        ),
+      );
+      bool open(int level) =>
+          tester
+              .widget<OutlinedButton>(find.byKey(ValueKey('difficulty-$level')))
+              .onPressed !=
+          null;
+      await render();
+      expect([open(1), open(2), open(3)], [true, false, false]);
+      game.answeredCounts[0][0] = 1;
+      game.answeredCounts[0][1] = 2;
+      await render();
+      expect([open(1), open(2), open(3)], [true, true, false]);
+      expect(find.text('لفتح الصعب: متوسط 2/3'), findsOneWidget);
+      game.answeredCounts[0][1] = 3;
+      await render();
+      await tester.tap(find.byKey(const ValueKey('difficulty-3')));
+      expect(selected, 3);
+      game.team = 1;
+      await render();
+      expect([open(1), open(2), open(3)], [true, false, false]);
+      await render(enabled: false);
+      expect([open(1), open(2), open(3)], [false, false, false]);
+    },
+  );
+  testWidgets(
     'Leaving a local race requires confirmation and cancel keeps the match',
     (tester) async {
       await tester.pumpWidget(
@@ -381,7 +420,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    final stone = find.byKey(const ValueKey('stone-0-1'));
+    final stone = find.byKey(const ValueKey('difficulty-1'));
     await tester.ensureVisible(stone);
     await tester.pumpAndSettle();
     await tester.tap(stone);
@@ -786,18 +825,12 @@ void main() {
     expect(repository.requested, [WarriorAge.child, WarriorAge.adult]);
     expect(find.byType(RaceBoard), findsOneWidget);
     expect(find.text('14'), findsNWidgets(2));
-    final locked = find.byKey(const ValueKey('stone-0-4'));
-    await tester.ensureVisible(locked);
-    await tester.pumpAndSettle();
-    await tester.tap(locked);
-    await tester.pump();
-    expect(
-      find.text('جاوب على سؤال سهل لفتح الأحجار المتوسطة'),
-      findsOneWidget,
-    );
+    final locked = find.byKey(const ValueKey('difficulty-2'));
+    expect(tester.widget<OutlinedButton>(locked).onPressed, isNull);
+    expect(find.text('لفتح المتوسط: سهل 0/1'), findsOneWidget);
+    expect(tester.widget<RaceBoard>(find.byType(RaceBoard)).onStone, isNull);
     expect(find.byType(QuestionScrollScreen), findsNothing);
-    final easy = find.byKey(const ValueKey('stone-0-1'));
-    await tester.scrollUntilVisible(easy, 250);
+    final easy = find.byKey(const ValueKey('difficulty-1'));
     await tester.ensureVisible(easy);
     await tester.pumpAndSettle();
     await tester.tap(easy);
@@ -814,10 +847,7 @@ void main() {
     final scores = tester.widget<RaceBoard>(find.byType(RaceBoard)).scores!;
     expect(scores[0], anyOf(10, 20));
     expect(scores[1], 0);
-    expect(
-      find.text('دور الأزرق • اضغط على حجر لاختيار السؤال'),
-      findsOneWidget,
-    );
+    expect(find.text('دور الأزرق • اختر مستوى السؤال'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

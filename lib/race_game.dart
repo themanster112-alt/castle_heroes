@@ -263,6 +263,22 @@ class RaceMatch {
       level == 1 ||
       (level == 2 && answeredCounts[team][0] >= 1) ||
       (level == 3 && answeredCounts[team][1] >= 3);
+  int stoneForLevel(int level) {
+    // Protocol 2 carries a platform number. Rotate within the chosen difficulty
+    // without making the progress stones interactive or losing surprise bonuses.
+    final first = level == 1
+        ? 1
+        : level == 2
+        ? 4
+        : 10;
+    final count = level == 1
+        ? 3
+        : level == 2
+        ? 6
+        : 5;
+    return first + answeredCounts[team][level - 1] % count;
+  }
+
   bool canChooseStone(int stone) =>
       levelUnlocked(stoneLevel(stone)) &&
       available(stoneLevel(stone)).isNotEmpty;
@@ -658,7 +674,7 @@ class _CastleRaceScreenState extends State<CastleRaceScreen> {
                         ),
                       ] else if (game.current == null) ...[
                         Text(
-                          'دور ${widget.names[game.team]} • اضغط على حجر لاختيار السؤال',
+                          'دور ${widget.names[game.team]} • اختر مستوى السؤال',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: raceGold,
@@ -683,6 +699,19 @@ class _CastleRaceScreenState extends State<CastleRaceScreen> {
                               ),
                             ),
                           ),
+                        DifficultyPicker(
+                          game: game,
+                          onSelected: (level) => setState(() {
+                            previousSteps = List.of(game.steps);
+                            previousScores = List.of(game.scores);
+                            game.chooseStone(game.stoneForLevel(level));
+                          }),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'تقدّم اللاعبين نحو القلعة',
+                          textAlign: TextAlign.center,
+                        ),
                         Stack(
                           children: [
                             RaceBoard(
@@ -693,23 +722,6 @@ class _CastleRaceScreenState extends State<CastleRaceScreen> {
                               previousSteps: previousSteps,
                               previousScores: previousScores,
                               active: game.team,
-                              canChooseStone: game.canChooseStone,
-                              onStone: (n) {
-                                final reason = game.stoneLockReason(n);
-                                if (reason != null) {
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(content: Text(reason)),
-                                    );
-                                  return;
-                                }
-                                setState(() {
-                                  previousSteps = List.of(game.steps);
-                                  previousScores = List.of(game.scores);
-                                  game.chooseStone(n);
-                                });
-                              },
                             ),
                             for (
                               var lane = 0;
@@ -772,6 +784,75 @@ class _CastleRaceScreenState extends State<CastleRaceScreen> {
       ),
     );
   }
+}
+
+class DifficultyPicker extends StatelessWidget {
+  final RaceMatch game;
+  final bool enabled;
+  final ValueChanged<int> onSelected;
+
+  const DifficultyPicker({
+    super.key,
+    required this.game,
+    required this.onSelected,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      for (var level = 1; level <= 3; level++)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: OutlinedButton(
+            key: ValueKey('difficulty-$level'),
+            onPressed: enabled && game.canChooseStone(game.stoneForLevel(level))
+                ? () => onSelected(level)
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Icon(
+                    game.levelUnlocked(level) ? Icons.quiz : Icons.lock_outline,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          level == 1
+                              ? 'سهل'
+                              : level == 2
+                              ? 'متوسط'
+                              : 'صعب',
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                        Text(
+                          !game.levelUnlocked(level)
+                              ? level == 2
+                                    ? 'لفتح المتوسط: سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
+                                    : 'لفتح الصعب: متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
+                              : game.available(level).isEmpty
+                              ? 'انتهت أسئلة هذا المستوى'
+                              : '${level * 10} نقطة • سؤال عشوائي',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      const Text(
+        'ابدأ بالسهل؛ بعد إجابة سهلة يُفتح المتوسط، وبعد ثلاث إجابات متوسطة يُفتح الصعب. لكل لاعب تقدّمه الخاص.',
+        textAlign: TextAlign.center,
+      ),
+    ],
+  );
 }
 
 class RaceSummary extends StatelessWidget {

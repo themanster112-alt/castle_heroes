@@ -498,7 +498,7 @@ class _OnlineRoomScreenState extends State<OnlineRoomScreen> {
           FilledButton(onPressed: _leave, child: const Text('العودة')),
         ] else if (question == null) ...[
           Text(
-            'مهلة اختيار الحجر: $_seconds ثانية',
+            'مهلة اختيار المستوى: $_seconds ثانية',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: _seconds <= 10 ? Colors.redAccent : raceGold,
@@ -510,29 +510,24 @@ class _OnlineRoomScreenState extends State<OnlineRoomScreen> {
           ),
           Text(
             myTurn
-                ? 'دورك الآن، اختر حجر السؤال'
+                ? 'دورك الآن، اختر مستوى السؤال'
                 : 'بانتظار ${names[game.team]} لاختيار السؤال',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24),
           ),
+          DifficultyPicker(
+            game: game,
+            enabled: myTurn,
+            onSelected: (level) => _send('choose', game.stoneForLevel(level)),
+          ),
+          const SizedBox(height: 16),
+          const Text('تقدّم اللاعبين نحو القلعة', textAlign: TextAlign.center),
           RaceBoard(
             names: names,
             characters: characters,
             steps: game.steps,
             scores: game.scores,
             active: game.team,
-            canChooseStone: (stone) => myTurn && game.canChooseStone(stone),
-            onStone: (stone) {
-              if (myTurn) {
-                final reason = game.stoneLockReason(stone);
-                if (reason == null) {
-                  _send('choose', stone);
-                } else {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(reason)));
-                }
-              }
-            },
           ),
           if (game.cannonArmed)
             const Text('القذيفة مفعّلة ×2', textAlign: TextAlign.center),
