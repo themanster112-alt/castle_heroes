@@ -20,7 +20,16 @@ class RaceQuestion {
   final int answer, number;
   final int? level;
   final String? flagUrl;
+  double get imageHeight =>
+      flagAsset?.startsWith('assets/question_photos/') == true ? 180 : 75;
   String? get flagAsset {
+    const photos = {
+      'https://img.btolat.com/2024/6/15/news/346055/large.jpg':
+          'assets/question_photos/ronaldinho.jpg',
+      'https://cdn.al-ain.com/images/2020/4/03/138-011530-kaka-real-madrid-milan_700x400.jpg':
+          'assets/question_photos/kaka.jpg',
+    };
+    if (photos.containsKey(flagUrl)) return photos[flagUrl];
     final uri = Uri.tryParse(flagUrl ?? '');
     if (uri == null) return null;
     if (uri.host == 'flagcdn.com') {

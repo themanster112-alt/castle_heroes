@@ -584,7 +584,12 @@ class _OnlineRoomScreenState extends State<OnlineRoomScreen> {
                   textAlign: TextAlign.center,
                 ),
                 if (question.flagAsset != null)
-                  Image.asset(question.flagAsset!, height: 70),
+                  Image.asset(
+                    question.flagAsset!,
+                    height: question.imageHeight,
+                    fit: BoxFit.contain,
+                    semanticLabel: 'صورة السؤال',
+                  ),
                 const SizedBox(height: 16),
                 Text(
                   question.text,

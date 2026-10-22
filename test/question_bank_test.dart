@@ -1,9 +1,36 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:castle_heroes/race_game.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('Player photos are bundled and independently playable', () {
+    final rows = jsonDecode(
+      File('data/adults_questions.json').readAsStringSync(),
+    ) as List;
+    final photos = rows
+        .where((row) => ['280', '281'].contains(row['id']))
+        .map((row) => RaceQuestion.fromJson(Map<String, dynamic>.from(row)))
+        .toList();
+    expect(photos.length, 2);
+    expect(photos.map((question) => question.flagAsset).toSet().length, 2);
+    for (final question in photos) {
+      expect(question.flagAsset, startsWith('assets/question_photos/'));
+      expect(File(question.flagAsset!).existsSync(), isTrue);
+      expect(question.imageHeight, 180);
+    }
+    final game = RaceMatch([photos]);
+    game.answeredCounts[0][0] = 1;
+    game.answeredCounts[0][1] = 3;
+    expect(game.chooseLevel(3), isTrue);
+    final first = game.current!.flagAsset;
+    game.submit(game.current!.answer);
+    game.nextTurn();
+    expect(game.chooseLevel(3), isTrue);
+    expect(game.current!.flagAsset, isNot(first));
+  });
   test(
     'Production banks have explicit difficulties, unique IDs and valid answers',
     () {
@@ -56,6 +83,7 @@ void main() {
             expect(saved['level'], imported['level']);
             expect(saved['options'], imported['options']);
             expect(saved['correctOptionIndex'], imported['correctOptionIndex']);
+            expect(saved['flagUrl'], imported['flagUrl']);
           }
         }
       }

@@ -353,10 +353,13 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
                                                   : NetworkImage(
                                                       question.flagUrl!,
                                                     ),
-                                              height: 75,
+                                              height: question.imageHeight,
+                                              semanticLabel: 'صورة السؤال',
                                               fit: BoxFit.contain,
                                               errorBuilder: (_, error, trace) =>
-                                                  const Text('تعذّر عرض العلم'),
+                                                  const Text(
+                                                    'تعذّر عرض صورة السؤال',
+                                                  ),
                                             ),
                                           ),
                                         Text(

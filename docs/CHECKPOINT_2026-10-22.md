@@ -15,3 +15,9 @@ Reviewed explicit difficulty for all 449 existing questions, preserving their ID
 Synced 379 changes to the original question-bank Firebase project and published online catalog version `2-95d8f08`. Existing catalog versions remain intact. Added a reusable Excel reader, validated repeatable batch merge, safe bank-sync tool and LF attributes so bank fingerprints survive cross-platform Git checkouts.
 
 Validation: 40 Flutter tests, 2 Node import tests, Flutter analysis, release web build, deployed Firestore transition tests, and byte-for-byte public catalog verification passed. Both players should refresh and create a new room after the bank update.
+
+## Completed player-photo questions
+
+The user supplied both missing direct image URLs. Added Ronaldinho and Kaka questions as adult hard IDs 280 and 281, completing all 21 questions in the approved workbook. Images are bundled under assets/question_photos and mapped from their source URLs, with a 180-pixel display in local and online play. Generic image semantics do not reveal the correct answer. Shirt descriptions distinguish the two prompts so text deduplication does not hide either question.
+
+Total: 470 questions (190 child, 280 adult); adult difficulty counts are 99 easy, 138 medium, 43 hard. Published catalog `2-6a19ce68`. The workbook import now has no pending rows. Validation: 41 Flutter tests, Flutter analysis, release web build and deployed Firestore security tests passed. Hosting is deployed; public bank assets and both published JPEGs match the local files byte for byte.
