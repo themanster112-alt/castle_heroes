@@ -1,4 +1,4 @@
-// Public reads first. Update only explicit difficulty on existing documents;
+// Public reads first. Update only explicit difficulty/topics on existing documents;
 // create new questions without overwriting any existing text or answer.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -28,14 +28,17 @@ const decode = value => 'nullValue' in value ? null : 'integerValue' in value ? 
         for (const key of ['question','options','correctOptionIndex','flagUrl']) {
           if (JSON.stringify(decode(doc.fields[key] || {nullValue:null})) !== JSON.stringify(fields[key])) throw Error(`Remote content differs: ${collection}/${id}/${key}; review before syncing`);
         }
-        if (decode(doc.fields.level || {nullValue:null}) !== fields.level) {
-          writes.push({update:{name,fields:{level:encode(fields.level)}},updateMask:{fieldPaths:['level']},currentDocument:{updateTime:doc.updateTime}}); updated++;
+        const changes = {};
+        if (decode(doc.fields.level || {nullValue:null}) !== fields.level) changes.level=encode(fields.level);
+        if (fields.category && decode(doc.fields.category || {nullValue:null}) !== fields.category) changes.category=encode(fields.category);
+        if (Object.keys(changes).length) {
+          writes.push({update:{name,fields:changes},updateMask:{fieldPaths:Object.keys(changes)},currentDocument:{updateTime:doc.updateTime}}); updated++;
         }
       } else {
         writes.push({update:{name,fields:Object.fromEntries(Object.entries({...fields,questionNumber:Number(id)}).map(([key,value])=>[key,encode(value)]))},currentDocument:{exists:false}}); added++;
       }
     }
-    console.log(`${collection}: ${added} additions, ${updated} difficulty updates; existing text and answers preserved.`);
+    console.log(`${collection}: ${added} additions, ${updated} difficulty/topic updates; existing text and answers preserved.`);
   }
   if(!process.argv.includes('--write')) {console.log(`Dry run: ${writes.length} writes, no remote changes.`); return;}
   if(!writes.length) {console.log('Already synchronized.'); return;}

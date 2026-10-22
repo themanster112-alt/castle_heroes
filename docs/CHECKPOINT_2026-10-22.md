@@ -29,3 +29,13 @@ The user approved a sixty-question mixed batch and specifically required medium/
 IDs: child 191–220; adult 282–311. New totals: 530 questions; children 220 (50/138/32 easy/medium/hard), adults 310 (102/151/57). Original IDs, text and answers remain intact. Published catalog `2-29988b28`. See QUESTION_BATCH_2026-10-22.md for all sixty questions, choices, correct answers, explanations and references.
 
 Validation: 42 Flutter tests, 4 Node tests, Flutter analysis, web release build and deployed Firestore transition/security checks passed. Hosting is deployed, the public assets match the local banks byte for byte, and remote synchronization has no pending writes. New tests reject easy religious additions, corrupted verse anchors and wrong arithmetic results. Editorial difficulty estimates remain subject to playtesting; evidence checks do not replace contextual review.
+
+## Twenty seconds and topic variety
+
+The user requested a fixed twenty-second timer and topic variety. Local questions and fresh loot attempts now use RaceMatch.questionSeconds = 20. Online protocol 3 enforces the same duration through server rules; legacy protocol 2 rooms retain 15 seconds. Current clients require matching room protocol and bank fingerprint. Active rules/config now reference firestore.online.v3.rules.
+
+All 530 bank records now carry explicit topic categories. Selection remains within the selected unlocked difficulty, avoids the previous delivered topic when alternatives exist, then favors least-used available topics across the match. Exhausting other topics never blocks a still-playable level. Canonical event replay records the delivered question category, so replay does not count a temporary random choice. New imports preserve/normalize reviewed topic labels.
+
+Original question text, options, correct answers, IDs and difficulty levels are preserved. Bank Firebase synchronization updates topic metadata only. Published catalog: `3-204f53e0`. Validation: 45 Flutter tests, 5 Node tests, clean Flutter analysis, web build, deployed rules tests (including rejecting 15 seconds in protocol 3 and preserving protocol 2 timing), and public bank byte verification passed. Hosting is deployed. Refresh both clients and create a new room for this release.
+
+Production browser checks passed twice after an initial cold-profile guest-entry attempt showed the generic connection error. The latter two runs verified room creation/join, difficulty locks, synchronized phaseSeconds=20, immediate offline departure and eventual remote closure. One repeat used exception tracing; the final repeat used fresh profiles and the normal harness. The initial connection failure's cause was not established and was not reproduced. Dedicated test profiles/accounts were cleaned up.

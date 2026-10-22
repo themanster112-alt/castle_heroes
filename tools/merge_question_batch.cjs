@@ -1,6 +1,7 @@
 // Merge a reviewed batch. Default is a dry run; --write saves validated additions.
 const fs = require('node:fs');
 const path = require('node:path');
+const {categoryFor} = require('./question_categories.cjs');
 const normalized = text => text.replace(/[\s\u064B-\u065F\u0640؟?!.,،]/g, '').toLowerCase();
 
 function merge(bank, batch) {
@@ -22,7 +23,7 @@ function merge(bank, batch) {
     if (item.flagUrl && !/^https:\/\//.test(item.flagUrl)) throw Error('Invalid image URL');
     if (texts.has(normalized(question))) { skipped.push(item.source || question); continue; }
     texts.add(normalized(question));
-    const record = {id: String(++nextId), question, options, correctOptionIndex: item.correctOptionIndex, flagUrl: item.flagUrl || null, level: item.level};
+    const record = {id: String(++nextId), question, options, correctOptionIndex: item.correctOptionIndex, flagUrl: item.flagUrl || null, level: item.level, category:categoryFor({...item,question})};
     result.push(record);
     added.push({id: record.id, source: item.source, question});
   }

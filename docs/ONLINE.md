@@ -4,7 +4,7 @@ Firebase project: `castle-heroes-online-20261021` (separate from the question-ba
 
 ## Play
 
-Question selection uses three difficulty buttons: easy, medium and hard. Medium opens after one easy answer, and hard after three medium answers, separately for each player. Answer counts include submitted wrong answers; timeouts do not count. Questions within the selected difficulty are random. The stones show score progress only and cannot be tapped. Selection uses the existing protocol 2 event format, so room rules remain compatible.
+Question selection uses three difficulty buttons: easy, medium and hard. Medium opens after one easy answer, and hard after three medium answers, separately for each player. Answer counts include submitted wrong answers; timeouts do not count. The stones show score progress only and cannot be tapped. Protocol 3 keeps the command/state format and uses a fixed 20-second timer for questions and loot.
 
 Open **تحدي 1×1 → اللعب أونلاين**. Choose **فتح غرفة**, enter your own name, age and character, and share the five-digit code. The other player chooses **الدخول إلى غرفة**, enters their own profile and the code. Both devices start automatically after the room is claimed. No account registration is required; Firebase signs each device in anonymously.
 
@@ -12,7 +12,9 @@ Codes expire after 30 minutes while waiting. Active rooms last up to three hours
 
 Closing a room requires confirmation and immediately returns to the previous screen, including offline. A direct Firestore write is queued with persistence enabled and closes the remote room when connectivity returns; the UI never waits for its acknowledgement. A finished room can reject a stale queued departure without blocking navigation. A temporary network interruption disables play inputs until Firestore reconnects. To rejoin after a page reload, enter the same code in the same browser profile; anonymous authentication persists there. Private browsing, clearing site data, or another device creates a different player identity.
 
-Protocol 2 rooms store an ordered command journal, seed, participant profiles, revision and a validated state snapshot. Both clients replay the journal and compare it with the snapshot. A content fingerprint rejects incompatible bank versions. An explicit canonical question key makes replay independent of differences in random selection between platforms. Firestore transactions resolve simultaneous joins and duplicate commands.
+Protocol 3 rooms store an ordered command journal, seed, participant profiles, revision and a validated state snapshot. Both clients replay the journal and compare it with the snapshot. A content fingerprint rejects incompatible bank versions. An explicit canonical question key makes replay independent of differences in random selection between platforms. Firestore transactions resolve simultaneous joins and duplicate commands.
+
+Topic selection stays within the selected, unlocked difficulty. It avoids the previous delivered topic when alternatives exist, then favors the least-used available topics across both players. If only one topic remains, play continues from it. Every published question has an explicit category. Canonical replay records the delivered question's category, including older journals. Topic rotation is a client selection policy; rules validate the chosen question and game state.
 
 All phase start timestamps are server-generated. Rules derive deadlines from those timestamps and fixed durations. Each client calibrates a monotonic clock against its own server-timestamped clock document; changing the device wall clock does not change the game clock. A connected room refreshes calibration periodically. Network latency can still cause small display differences; Firebase's server deadline decides whether a request is timely.
 
@@ -21,8 +23,8 @@ All phase start timestamps are server-generated. Rules derive deadlines from tho
 - Anonymous Firebase Authentication enabled.
 - Firestore Standard database in `europe-west1`, free tier.
 - Web and Android applications registered; public SDK configuration in `lib/online_firebase_options.dart`.
-- Active rules are `firestore.online.v2.rules`, referenced by the **separate** configuration below. Do not deploy `firestore.rules` from the original question-bank project here.
-- Immutable versioned metadata for all 449 questions is published under `online_catalog/{version}`. It contains only normalized public question texts, answer indices, difficulty and occurrence counts derived from the already-published bundled assets. It contains no administrator credentials or player data.
+- Active rules are `firestore.online.v3.rules`, referenced by the **separate** configuration below. Do not deploy `firestore.rules` from the original question-bank project here.
+- Immutable versioned metadata for all 530 questions is published under `online_catalog/{version}`. It contains only normalized public question texts, answer indices, difficulty and occurrence counts derived from the already-published bundled assets. It contains no administrator credentials or player data.
 
 ```powershell
 node tools/publish_online_catalog.cjs --dry-run
@@ -55,6 +57,6 @@ Rules validate exact score changes, difficulty unlocks, exhausted levels, cannon
 
 Question content/answer indices are already public in the bundled app. These checks prevent invalid state changes; they do not conceal answers or prevent collusion or a modified client selecting a particular otherwise-valid question. This is a casual two-player game, not a system guaranteeing competitive secrecy.
 
-Old closed/expired room documents currently remain in Firestore. Codes are collision-checked; at high volume, add retention/code recycling before the 90,000-code space fills. Protocol 1 rooms cannot continue with protocol 2; refresh both devices and create a new room after this upgrade.
+Old closed/expired room documents currently remain in Firestore. Codes are collision-checked; at high volume, add retention/code recycling before the 90,000-code space fills. Legacy protocol 2 rooms retain their original 15-second timer under the updated rules. Both players should refresh and create a protocol 3 room for the 20-second timer and topic-balanced banks.
 
 Other fixes included with online rooms: question identity distinguishes different content with the same numeric ID; text repeats still stay blocked. Exhaustion ends the match with the highest score, or a draw on equal scores. Leaving a local match requires confirmation.

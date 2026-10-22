@@ -143,7 +143,8 @@ class OnlineService {
       final ref = rooms.doc(code);
       final data = (await tx.get(ref)).data();
       if (data == null) throw StateError('الغرفة غير موجودة');
-      if (data['version'] != bankVersion) {
+      if (data['version'] != bankVersion ||
+          data['protocol'] != OnlineMatch.version) {
         throw StateError('نسخة اللعبة مختلفة؛ حدّث اللعبة على الجهازين');
       }
       final players = (data['players'] as List)
@@ -211,7 +212,7 @@ class OnlineService {
       }
       final phase = OnlineMatch.phase(match.game);
       final seconds = phase == 'answer' || phase == 'loot'
-          ? 15
+          ? RaceMatch.questionSeconds
           : phase == 'result'
           ? (wasLoot && kind == 'answer' ? 6 : 3)
           : phase == 'choose'

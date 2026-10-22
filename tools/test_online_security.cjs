@@ -101,7 +101,7 @@ function action(before, kind, overrides = {}) {
   const first = fixtures.cases.find(item => item.label === 'choose easy question');
   // Exercise real creation/joining in addition to seeded state-transition cases.
   const code = String(crypto.randomInt(10000, 100000));
-  const waiting = {protocol: 2, version: fixtures.version, seed: 7, players: [personalize(fixtures.initial.players[0])], status: 'waiting', phase: 'waiting', turnUid: users[0].localId, revision: 0, events: {}, state: null, startedAt: null, phaseStartedAt: null, phaseSeconds: 0};
+  const waiting = {protocol: fixtures.initial.protocol, version: fixtures.version, seed: 7, players: [personalize(fixtures.initial.players[0])], status: 'waiting', phase: 'waiting', turnUid: users[0].localId, revision: 0, events: {}, state: null, startedAt: null, phaseStartedAt: null, phaseSeconds: 0};
   const created = await commit(users[0].idToken, code, waiting, {exists: false}, [stamp('createdAt'), stamp('updatedAt')]);
   assert.equal(created.status, 200, `Create: ${created.data.error?.message}`); rooms.push(code);
   const hostDoc = await request(`${base}/${collection}/${code}`, administrator, 'GET');
@@ -140,6 +140,11 @@ function action(before, kind, overrides = {}) {
   await check('guest acting during host turn', first.before, wrongActor, false, {user: 1});
   const longTimer = clone(first.after); longTimer.phaseSeconds = 3600;
   await check('extending the answer timer', first.before, longTimer, false);
+  const shortTimer = clone(first.after); shortTimer.phaseSeconds = 15;
+  await check('protocol 3 rejects the obsolete fifteen-second question timer', first.before, shortTimer, false);
+  const legacyBefore = clone(first.before), legacyAfter = clone(first.after);
+  legacyBefore.protocol = 2; legacyAfter.protocol = 2; legacyAfter.phaseSeconds = 15;
+  await check('legacy protocol 2 rooms retain their original timer', legacyBefore, legacyAfter, true);
   await check('forged future phase timestamp', first.before, first.after, false, {phaseStartedAt: new Date('2040-01-01T00:00:00Z')});
   const forfeit = fixtures.cases.find(item => item.label === 'selection deadline forfeit');
   await check('selection forfeit before 60 seconds', forfeit.before, forfeit.after, false, {expired: false});

@@ -57,7 +57,7 @@ service cloud.firestore {
       }
       function join() {
         let oldRoom = b(); let nextRoom = a();
-        return oldRoom.protocol == 2 && oldRoom.status == 'waiting' && request.time < oldRoom.createdAt + duration.value(30,'m') &&
+        return oldRoom.protocol in [2,3] && oldRoom.status == 'waiting' && request.time < oldRoom.createdAt + duration.value(30,'m') &&
           oldRoom.players.size() == 1 && nextRoom.players.size() == 2 && nextRoom.players[0] == oldRoom.players[0] && profile(nextRoom.players[1]) &&
           nextRoom.players[1].uid == request.auth.uid && request.auth.uid != oldRoom.players[0].uid &&
           nextRoom.status == 'playing' && nextRoom.phase == 'choose' && nextRoom.startedAt == request.time && nextRoom.phaseStartedAt == request.time && nextRoom.phaseSeconds is int && nextRoom.phaseSeconds == 60 && initial() &&
@@ -131,8 +131,8 @@ service cloud.firestore {
       function move() {
         let oldRoom = b(); let nextRoom = a(); let nextState = n(); let command = e();
         let automatic = command.kind in ['timeout','next','forfeit'];
-        let seconds = nextRoom.phase in ['answer','loot'] ? 15 : nextRoom.phase == 'choose' ? 60 : nextRoom.phase == 'result' ? (oldRoom.phase == 'loot' && command.kind == 'answer' ? 6 : 3) : 0;
-        return oldRoom.protocol == 2 && oldRoom.status == 'playing' && request.time < oldRoom.startedAt+duration.value(3,'h') &&
+        let seconds = nextRoom.phase in ['answer','loot'] ? (oldRoom.protocol == 3 ? 20 : 15) : nextRoom.phase == 'choose' ? 60 : nextRoom.phase == 'result' ? (oldRoom.phase == 'loot' && command.kind == 'answer' ? 6 : 3) : 0;
+        return oldRoom.protocol in [2,3] && oldRoom.status == 'playing' && request.time < oldRoom.startedAt+duration.value(3,'h') &&
           nextRoom.revision is int && nextRoom.revision == oldRoom.revision+1 && nextRoom.revision <= 2500 && nextRoom.events.size() == oldRoom.events.size()+1 && nextRoom.events.diff(oldRoom.events).affectedKeys().hasOnly([string(oldRoom.revision)]) &&
           command.keys().hasOnly(command.kind == 'choose' ? ['kind','value','actor','question'] : ['kind','value','actor']) && command.actor is int && command.actor in [0,1] && oldRoom.players[command.actor].uid == request.auth.uid &&
           (command.kind in ['choose','answer'] ? command.value is int : command.value == null) && nextRoom.phaseSeconds is int &&
@@ -147,7 +147,7 @@ service cloud.firestore {
       allow list, delete: if false;
       allow create: if signed() && code.matches('^[0-9]{5}$') &&
         a().keys().hasOnly(['players','status','protocol','version','seed','events','revision','phase','turnUid','createdAt','updatedAt','startedAt','phaseStartedAt','phaseSeconds','state']) &&
-        a().protocol is int && a().protocol == 2 && a().version is string && exists(/databases/$(database)/documents/online_catalog/$(a().version)) &&
+        a().protocol is int && a().protocol in [2,3] && a().version is string && a().version.matches('^' + string(a().protocol) + '-[0-9a-f]+$') && exists(/databases/$(database)/documents/online_catalog/$(a().version)) &&
         a().players.size() == 1 && profile(a().players[0]) && a().players[0].uid == request.auth.uid && a().status == 'waiting' && a().phase == 'waiting' && a().turnUid == request.auth.uid &&
         a().revision is int && a().revision == 0 && a().events == {} && a().seed is int && a().seed >= 0 && a().seed < 2147483648 &&
         a().createdAt == request.time && a().updatedAt == request.time && a().startedAt == null && a().phaseStartedAt == null && a().phaseSeconds is int && a().phaseSeconds == 0 && a().state == null;

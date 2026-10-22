@@ -20,7 +20,7 @@ for (let age = 0; age < names.length; age++) {
     counts[age][fields[level - 1]]++;
   });
 }
-const version = `2-${hash.toString(16)}`;
+const version = `3-${hash.toString(16)}`;
 const occurrences = new Map();
 for (const row of rows) {
   if (!occurrences.has(row.text)) occurrences.set(row.text, {'0': {easy: 0, medium: 0, hard: 0}, '1': {easy: 0, medium: 0, hard: 0}});

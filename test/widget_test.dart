@@ -196,7 +196,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1200));
       await tester.pump(const Duration(seconds: 1));
       expect(game.answered, isTrue);
-      expect(find.text('الوقت المتبقي: 15 ثانية'), findsOneWidget);
+      expect(find.text('الوقت المتبقي: 20 ثانية'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     },
   );
@@ -267,7 +267,7 @@ void main() {
         expect(game.lootPending, isTrue);
         expect(find.byKey(const ValueKey('loot-banner')), findsOneWidget);
         expect(find.text('دورك الآن يا الثاني'), findsOneWidget);
-        expect(find.text('الوقت المتبقي: 15 ثانية'), findsOneWidget);
+        expect(find.text('الوقت المتبقي: 20 ثانية'), findsOneWidget);
         expect(find.text('العودة إلى السباق خلال 3 ثوانٍ'), findsNothing);
         expect(find.byIcon(Icons.check_circle), findsNothing);
         expect(tester.widget<OutlinedButton>(wrong).onPressed, isNull);
@@ -304,7 +304,9 @@ void main() {
           await tester.pump(const Duration(milliseconds: 400));
           expect(returns, 0);
         } else {
-          await tester.pump(const Duration(seconds: 11));
+          await tester.pump(const Duration(seconds: 15));
+          expect(game.lootPending, isTrue);
+          await tester.pump(const Duration(seconds: 1));
           expect(game.lootUsed[1], isFalse);
           expect(game.scores[1], 50);
         }
@@ -555,7 +557,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    for (var i = 0; i < 15; i++) {
+    for (var i = 0; i < RaceMatch.questionSeconds; i++) {
       await tester.pump(const Duration(seconds: 1));
     }
     expect(game.answered, isTrue);

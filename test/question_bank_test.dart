@@ -49,6 +49,8 @@ void main() {
           expect(row['level'], isIn([1, 2, 3]), reason: '$name/${row['id']}');
           levels.add(row['level'] as int);
           expect(row['question'], isNotEmpty);
+          expect(row['category'], isA<String>());
+          expect((row['category'] as String).trim(), isNotEmpty);
           final options = (row['options'] as List).cast<String>();
           expect(options.length, 3);
           expect(options.toSet().length, 3);

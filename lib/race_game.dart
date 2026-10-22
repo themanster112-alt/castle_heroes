@@ -16,6 +16,7 @@ enum WarriorAge { child, adult }
 
 class RaceQuestion {
   final String id, text;
+  final String category;
   final List<String> options;
   final int answer, number;
   final int? level;
@@ -106,6 +107,7 @@ class RaceQuestion {
     required this.number,
     this.level,
     this.flagUrl,
+    this.category = 'ثقافة عامة',
   });
   factory RaceQuestion.fromJson(Map<String, dynamic> data) => RaceQuestion(
     id: data['id'].toString(),
@@ -115,6 +117,7 @@ class RaceQuestion {
     number: int.parse((data['questionNumber'] ?? data['id']).toString()),
     flagUrl: data['flagUrl'] as String?,
     level: int.tryParse('${data['level']}'),
+    category: (data['category'] as String?) ?? 'ثقافة عامة',
   );
   late final String normalizedText = text
       .replaceAll(RegExp(r'[\s\u064B-\u065F\u0640؟?!.,،]'), '')
@@ -193,6 +196,9 @@ class QuestionRepository {
 
 /// One shared ledger per match, including questions answered incorrectly.
 class RaceMatch {
+  static const questionSeconds = 20;
+  final categoryHistory = <String>[];
+  final categoryCounts = <String, int>{};
   static const stationCount = 14;
   static const winningScore = 280, unlockScore = 150;
   static const surpriseBonus = 10;
@@ -331,17 +337,36 @@ class RaceMatch {
     return null;
   }
 
-  bool chooseStone(int stone) {
+  bool chooseStone(int stone, {RaceQuestion? selectedQuestion}) {
     if (stone < 1 || stone > stationCount || !canChooseStone(stone)) {
       return false;
     }
-    if (!chooseLevel(stoneLevel(stone))) return false;
+    if (!chooseLevel(stoneLevel(stone), selectedQuestion: selectedQuestion)) {
+      return false;
+    }
     selectedStone = stone;
     surpriseQuestion = !surpriseClaimed[team] && surpriseStones[team] == stone;
     return true;
   }
 
-  bool chooseLevel(int level) {
+  List<RaceQuestion> selectionCandidates(int level) {
+    var questions = available(level);
+    if (questions.isEmpty) return questions;
+    if (categoryHistory.isNotEmpty) {
+      final alternatives = questions
+          .where((q) => q.category != categoryHistory.last)
+          .toList();
+      if (alternatives.isNotEmpty) questions = alternatives;
+    }
+    final leastUsed = questions
+        .map((q) => categoryCounts[q.category] ?? 0)
+        .reduce(min);
+    return questions
+        .where((q) => (categoryCounts[q.category] ?? 0) == leastUsed)
+        .toList();
+  }
+
+  bool chooseLevel(int level, {RaceQuestion? selectedQuestion}) {
     if (!levelUnlocked(level) ||
         level < 1 ||
         level > 3 ||
@@ -350,12 +375,23 @@ class RaceMatch {
         winner != null) {
       return false;
     }
-    final questions = available(level);
+    final questions = selectedQuestion == null
+        ? selectionCandidates(level)
+        : available(level);
     if (questions.isEmpty) return false;
+    if (selectedQuestion != null && !questions.contains(selectedQuestion)) {
+      return false;
+    }
     chosenLevel = level;
     selectedStone = null;
     surpriseQuestion = false;
-    current = questions[random.nextInt(questions.length)];
+    current = selectedQuestion ?? questions[random.nextInt(questions.length)];
+    categoryHistory.add(current!.category);
+    categoryCounts.update(
+      current!.category,
+      (count) => count + 1,
+      ifAbsent: () => 1,
+    );
     usedIds.add('${current!.id}:${current!.normalizedText}');
     usedTexts.add(current!.normalizedText);
     return true;

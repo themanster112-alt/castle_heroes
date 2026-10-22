@@ -5,7 +5,7 @@ import 'race_game.dart';
 
 /// Replaying the same ordered commands against the same banks synchronizes both devices.
 class OnlineMatch {
-  static const version = 2;
+  static const version = 3;
   final Map<String, dynamic> data;
   final RaceMatch game;
   OnlineMatch._(this.data, this.game);
@@ -98,16 +98,11 @@ class OnlineMatch {
     final value = event['value'] as int?;
     switch (kind) {
       case 'choose':
-        if (!game.chooseStone(value!)) throw StateError('اختيار سؤال غير متاح');
-        final desired = event['selectedQuestion'] as RaceQuestion?;
-        if (desired != null && desired != game.current) {
-          game.usedIds.remove(
-            '${game.current!.id}:${game.current!.normalizedText}',
-          );
-          game.usedTexts.remove(game.current!.normalizedText);
-          game.current = desired;
-          game.usedIds.add('${desired.id}:${desired.normalizedText}');
-          game.usedTexts.add(desired.normalizedText);
+        if (!game.chooseStone(
+          value!,
+          selectedQuestion: event['selectedQuestion'] as RaceQuestion?,
+        )) {
+          throw StateError('اختيار سؤال غير متاح');
         }
       case 'cannon':
         if (!game.armCannon()) throw StateError('القذيفة غير متاحة');

@@ -1,5 +1,5 @@
 {
-  "firestore": {"rules": "firestore.online.v2.rules"},
+  "firestore": {"rules": "firestore.online.v3.rules"},
   "hosting": {
     "public": "build/web",
     "ignore": ["firebase.online.json", "**/.*", "**/node_modules/**"],

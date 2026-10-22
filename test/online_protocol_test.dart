@@ -42,9 +42,9 @@ void main() {
             .toList(),
       );
     }
-    final version = '2-${hash.toRadixString(16)}';
+    final version = '${OnlineMatch.version}-${hash.toRadixString(16)}';
     Map<String, dynamic> fresh() => {
-      'protocol': 2,
+      'protocol': OnlineMatch.version,
       'version': version,
       'seed': 7,
       'events': <String, dynamic>{},
@@ -92,7 +92,7 @@ void main() {
         'phaseSeconds': phase == 'choose'
             ? 60
             : ['answer', 'loot'].contains(phase)
-            ? 15
+            ? RaceMatch.questionSeconds
             : phase == 'result'
             ? (wasLoot && kind == 'answer' ? 6 : 3)
             : 0,

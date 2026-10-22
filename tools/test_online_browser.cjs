@@ -97,7 +97,7 @@ const browsers = [];
   assert.equal(guestChoices.length, 3);
   assert.ok(guestChoices.every(choice => choice.disabled));
   await host.evaluate(`(() => {const e=Array.from(document.querySelectorAll('[role=button]')).find(e => (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith('سهل'));e.scrollIntoView({block:'center'});e.click();})()`);
-  await host.waitFor(async () => host.evaluate(`(async()=>{const f=window.firebase_firestore,app=window.firebase_core.getApp('online');const d=(await f.getDoc(f.doc(f.getFirestore(app),'rooms',${JSON.stringify(code)}))).data();return d.phase==='answer'&&d.state.level===1;})()`), 'easy button starts synchronized question');
+  await host.waitFor(async () => host.evaluate(`(async()=>{const f=window.firebase_firestore,app=window.firebase_core.getApp('online');const d=(await f.getDoc(f.doc(f.getFirestore(app),'rooms',${JSON.stringify(code)}))).data();return d.phase==='answer'&&d.state.level===1&&d.phaseSeconds===20;})()`), 'easy button starts synchronized question');
   console.log('PASS difficulty buttons enforce turn and locks and start a validated easy question');
   await host.offline(true);
   await host.click('Back');

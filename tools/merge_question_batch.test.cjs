@@ -1,6 +1,7 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const {merge} = require('./merge_question_batch.cjs');
+const {categoryFor} = require('./question_categories.cjs');
 const question = {question:'A new question?', options:['one','two','three'],correctOptionIndex:1,level:3};
 test('merge preserves existing IDs, skips normalized duplicates and is repeatable',()=>{
   const bank=[{...question,id:'42',question:'Existing question'}];
@@ -19,4 +20,9 @@ test('invalid options or answer reject the entire batch without mutating the ban
     assert.throws(()=>merge(bank,{collection:'adults_questions',questions:[question,invalid]}));
     assert.equal(bank.length,0);
   }
+});
+test('reviewed categories and photo topics survive imports',()=>{
+  const result=merge([],{collection:'adults_questions',questions:[{...question,category:'الدين الإسلامي والقرآن'}]});
+  assert.equal(result.bank[0].category,'الدين والقرآن');
+  assert.equal(categoryFor({question:'من اللاعب؟',flagUrl:'https://img.btolat.com/photo.jpg'}),'الرياضة');
 });

@@ -35,7 +35,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
   int? selected;
   int? _resultTeam;
   Timer? _timer, _returnTimer;
-  int remaining = 15;
+  int remaining = RaceMatch.questionSeconds;
   AudioPlayer? _warningPlayer;
   bool get _urgent => remaining <= 5 && !widget.game.answered;
 
@@ -77,7 +77,7 @@ class _QuestionScrollScreenState extends State<QuestionScrollScreen>
     });
     if (widget.game.lootPending) {
       selected = null;
-      remaining = 15;
+      remaining = RaceMatch.questionSeconds;
       _startTimer();
       if (_scrollController.hasClients) _scrollController.jumpTo(0);
     } else {
