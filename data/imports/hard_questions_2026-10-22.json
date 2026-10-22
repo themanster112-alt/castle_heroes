@@ -1,0 +1,301 @@
+{
+  "sourceWorkbook": "Castle_Heroes_Hard_Questions.xlsx",
+  "collection": "adults_questions",
+  "ages": "13+",
+  "sourceSelection": "اعتمد المستخدم النسخة الحالية ذات الورقة الواحدة والأسئلة الـ21 فقط.",
+  "questions": [
+    {
+      "source": "1:2",
+      "question": "ما اسم القطعة الأثرية المكتشفة عام 1799، التي ساعد نصها المكتوب بثلاثة خطوط على فك الهيروغليفية؟",
+      "options": [
+        "مسلة ميشع",
+        "حجر رشيد",
+        "لوحة نعرمر"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": "https://nationalmuseumpublications.co.za/wp-content/uploads/2021/02/Rosetta-Stone.jpg",
+      "edited": true
+    },
+    {
+      "source": "1:3",
+      "question": "ما اسم المسلة البابلية المعروضة في متحف اللوفر والتي نُقشت عليها نحو 282 مادة قانونية؟",
+      "options": [
+        "مسلة حمورابي",
+        "مسلة أمنمحات",
+        "مسلة شلمنصر"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": "9c13dbb857febe3864f9083e74f1f19e.jpg (1200×1600) (pinimg.com)",
+      "edited": true
+    },
+    {
+      "source": "1:4",
+      "question": "ما هي السلسلة الجبلية التي تُعد الحد الطبيعي الفاصل بين قارتي أوروبا وآسيا؟",
+      "options": [
+        "جبال القوقاز",
+        "جبال الألب",
+        "جبال الأورال"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:5",
+      "question": "ما هي أول رواية تاريخية نشرها الأديب المصري حائز جائزة نوبل نجيب محفوظ عام 1939؟",
+      "options": [
+        "عبث الأقدار",
+        "رادوبيس",
+        "كفاح طيبة"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:6",
+      "question": "من هو الشاعر الجاهلي صاحب المعلقة التي تبدأ ببيت: 'قِفَا نَبْكِ مِنْ ذِكْرَى حَبِيبٍ وَمَنْزِلِ'؟",
+      "options": [
+        "زهير بن أبي سلمى",
+        "امرؤ القيس",
+        "طرفة بن العبد"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:7",
+      "question": "من هو أول رئيس لجمهورية مصر العربية بعد إلغاء الملكية عام 1953؟",
+      "options": [
+        "جمال عبد الناصر",
+        "أنور السادات",
+        "محمد نجيب"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:8",
+      "question": "ما اسم العالم المسلم الذي ألّف موسوعة 'كتاب المناظر' وأسس علم البصريات الحديث استناداً إلى التجريب العلمي؟",
+      "options": [
+        "الحسن بن الهيثم",
+        "يعقوب بن إسحاق الكندي",
+        "جابر بن حيان"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:9",
+      "question": "ما الغاز الأساسي الذي يشكل أكثر من 96% من الغلاف الجوي لكوكب الزهرة؟",
+      "options": [
+        "النيتروجين",
+        "الميثان",
+        "ثاني أكسيد الكربون"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:10",
+      "question": "من هو الإمام الذي يُعتبر أول من دوّن كتاباً متكاملاً في علم أصول الفقه في كتابه الشهير 'الرسالة'؟",
+      "options": [
+        "الإمام مالك",
+        "الإمام الشافعي",
+        "الإمام أبو حنيفة"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:13",
+      "question": "ما اسم الملعب المكسيكي الذي استضاف نهائي كأس العالم لكرة القدم عامي 1970 و1986؟",
+      "options": [
+        "ملعب ماراكانا",
+        "ملعب أزتيكا",
+        "ملعب المونومنتال"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": true
+    },
+    {
+      "source": "1:14",
+      "question": "أي منتخب شارك في جميع النسخ الـ22 الأولى من كأس العالم لكرة القدم للرجال، من 1930 حتى 2022؟",
+      "options": [
+        "ألمانيا",
+        "إيطاليا",
+        "البرازيل"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": true
+    },
+    {
+      "source": "1:15",
+      "question": "ما هي السورة الكريمة التي وردت فيها آية البسملة (بسم الله الرحمن الرحيم) مرتين؟",
+      "options": [
+        "سورة التوبة",
+        "سورة النحل",
+        "سورة النمل"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:16",
+      "question": "من هو الصحابي الجليل الوحيد الذي ذُكر اسمه صراحةً ومباشرةً في آيات القرآن الكريم؟",
+      "options": [
+        "أبو بكر الصديق",
+        "زيد بن حارثة",
+        "بلال بن رباح"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:17",
+      "question": "ما السورة التي تذكر أسماء 18 نبيًا في الآيات من 84 إلى 86؟",
+      "options": [
+        "سورة الأنعام",
+        "سورة الأنبياء",
+        "سورة هود"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": true
+    },
+    {
+      "source": "1:18",
+      "question": "ماذا يُطلق في علم مصطلح الحديث على الحديث الذي رواه جمع غفير عن جمع غفير يمتنع عقلاً تواطؤهم على الكذب؟",
+      "options": [
+        "الحديث المشهور",
+        "الحديث الآحاد",
+        "الحديث المتواتر"
+      ],
+      "correctOptionIndex": 2,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:19",
+      "question": "من هو الصحابي الذي أرسله النبي ﷺ أول سفير ومعلم للقرآن إلى أهل المدينة المنورة قبل الهجرة النبوية؟",
+      "options": [
+        "مصعب بن عمير",
+        "معاذ بن جبل",
+        "سعد بن معاذ"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:20",
+      "question": "ما اسم الصحابي الجليل الذي استضاف النبي ﷺ في بيته بالمدينة المنورة عند وصوله في الهجرة حتى بُني المسجد والمسكن؟",
+      "options": [
+        "سعد بن عبادة",
+        "أبو أيوب الأنصاري",
+        "أسعد بن زرارة"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    },
+    {
+      "source": "1:21",
+      "question": "من الصحابي الذي تعلّم كتابة اليهود بأمر النبي ﷺ ليقرأ له رسائلهم ويكتب إليهم؟",
+      "options": [
+        "عبد الله بن مسعود",
+        "زيد بن ثابت",
+        "أبي بن كعب"
+      ],
+      "correctOptionIndex": 1,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": true
+    },
+    {
+      "source": "1:22",
+      "question": "ما هي السورة الكريمة التي تُعرف وتسمى أيضاً بـ 'سورة بني إسرائيل'؟",
+      "options": [
+        "سورة الإسراء",
+        "سورة المائدة",
+        "سورة القصص"
+      ],
+      "correctOptionIndex": 0,
+      "level": 3,
+      "flagUrl": null,
+      "sourceImage": null,
+      "edited": false
+    }
+  ],
+  "pending": [
+    {
+      "source": "1:11",
+      "question": "من اللاعب الذي يظهر في الصورة؟",
+      "options": [
+        "رونالدو نازاريو",
+        "ريفالدو",
+        "رونالدينيو"
+      ],
+      "answer": "رونالدينيو",
+      "image": "large.jpg (1200×770) (btolat.com)",
+      "reason": "يتطلب صورة لاعب؛ المتوفر اسم ملف وليس رابطًا مباشرًا أو صورة مضمّنة."
+    },
+    {
+      "source": "1:12",
+      "question": "من اللاعب الذي يظهر في الصورة؟",
+      "options": [
+        "كاكا",
+        "تيري هنري",
+        "ديدييه ديشامب"
+      ],
+      "answer": "كاكا",
+      "image": "138-011530-kaka-real-madrid-milan_700x400.jpg (700×400) (al-ain.com)",
+      "reason": "يتطلب صورة لاعب؛ المتوفر اسم ملف وليس رابطًا مباشرًا أو صورة مضمّنة."
+    }
+  ],
+  "notes": "حُوّلت أسئلة الآثار والملعب لصياغة مستقلة عن الصور، وحُفظت الروابط الأصلية للمراجعة."
+}

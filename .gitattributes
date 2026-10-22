@@ -1,0 +1,4 @@
+# Online bank fingerprints include the bundled bytes: keep them identical
+# across Windows, macOS and Linux checkouts.
+data/*.json text eol=lf
+data/imports/*.json text eol=lf

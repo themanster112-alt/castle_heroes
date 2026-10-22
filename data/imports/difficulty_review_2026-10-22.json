@@ -1,0 +1,2188 @@
+{
+  "date": "2026-10-22",
+  "ages": {
+    "children": "حتى 12 سنة شاملًا",
+    "adults": "13 سنة فما فوق"
+  },
+  "method": "تقدير تحريري للمحتوى والخيارات؛ ليس قياسًا تجريبيًا لنسبة الإجابات الصحيحة. لا نعتمد ترتيب الصفوف ولا نفرض أعدادًا متساوية للمستويات.",
+  "banks": {
+    "adults": {
+      "counts": {
+        "easy": 99,
+        "medium": 138,
+        "hard": 41
+      },
+      "changed": [
+        {
+          "id": "1",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد الحواس"
+        },
+        {
+          "id": "2",
+          "before": null,
+          "after": 1,
+          "question": "ما هي الحاسة التي نستخدمها في الشم"
+        },
+        {
+          "id": "3",
+          "before": null,
+          "after": 1,
+          "question": "ما اسم النبي الذي ابتلعه الحوت"
+        },
+        {
+          "id": "4",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : أَلَمْ نَجْعَلِ الْأَرْضَ مِهَادًا"
+        },
+        {
+          "id": "5",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد أصابع اليد"
+        },
+        {
+          "id": "6",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم السورة التي تعادل ثلث القرآن"
+        },
+        {
+          "id": "7",
+          "before": null,
+          "after": 1,
+          "question": "من هو خاتم الأنبياء"
+        },
+        {
+          "id": "8",
+          "before": null,
+          "after": 1,
+          "question": "ما عدد ساعات اليوم"
+        },
+        {
+          "id": "9",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد الأرجل لثلاثة قطط؟"
+        },
+        {
+          "id": "10",
+          "before": null,
+          "after": 1,
+          "question": "ما اسم الشهر الذي نصوم فيه"
+        },
+        {
+          "id": "11",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'tree'"
+        },
+        {
+          "id": "12",
+          "before": null,
+          "after": 1,
+          "question": "ما لون الحليب"
+        },
+        {
+          "id": "13",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'dog'"
+        },
+        {
+          "id": "14",
+          "before": null,
+          "after": 1,
+          "question": "ما هو صوت القطة"
+        },
+        {
+          "id": "15",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : وَإِذَا الْعِشَارُ عُطِّلَتْ"
+        },
+        {
+          "id": "16",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد أركان الإسلام"
+        },
+        {
+          "id": "17",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الحيوان المعروف بسفينة الصحراء"
+        },
+        {
+          "id": "18",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد الحروف في اللغة العربية"
+        },
+        {
+          "id": "19",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 9 + 11"
+        },
+        {
+          "id": "20",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 10 + 4"
+        },
+        {
+          "id": "21",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي نجلس عليه وله أربع أرجل"
+        },
+        {
+          "id": "22",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم الكوكب الثالث من الشمس"
+        },
+        {
+          "id": "23",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد أضلاع المستطيل"
+        },
+        {
+          "id": "24",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : هَلْ أَتَىٰكَ حَدِيثُ الْغَاشِيَةِ"
+        },
+        {
+          "id": "25",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي كلما أخذت منه كبر"
+        },
+        {
+          "id": "26",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أقرب كوكب إلى الشمس"
+        },
+        {
+          "id": "27",
+          "before": null,
+          "after": 1,
+          "question": "التفاحة أغلى من الموزة، والموزة أغلى من البرتقالة، فمن الأرخص؟"
+        },
+        {
+          "id": "28",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد أرجل الحشرة"
+        },
+        {
+          "id": "29",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أول مسجد في الإسلام"
+        },
+        {
+          "id": "30",
+          "before": null,
+          "after": 1,
+          "question": "ما هو العضو المسؤول عن الرؤية"
+        },
+        {
+          "id": "31",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الحيوان الذي يملك خرطومًا"
+        },
+        {
+          "id": "32",
+          "before": null,
+          "after": 1,
+          "question": "ما الصلاة التي تُصلى يوم الجمعة"
+        },
+        {
+          "id": "33",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي لا يمشي إلا بالضرب"
+        },
+        {
+          "id": "34",
+          "before": null,
+          "after": 1,
+          "question": "هذا العلم لاي دولة"
+        },
+        {
+          "id": "35",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : عَمَّ يَتَسَاءَلُونَ"
+        },
+        {
+          "id": "36",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي يُسمع ولا يُرى"
+        },
+        {
+          "id": "37",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أول غزوة في الإسلام"
+        },
+        {
+          "id": "38",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'chair'"
+        },
+        {
+          "id": "39",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الحيوان الذي يغير لونه"
+        },
+        {
+          "id": "40",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'fish'"
+        },
+        {
+          "id": "41",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم عاصمة لبنان"
+        },
+        {
+          "id": "42",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'cat'"
+        },
+        {
+          "id": "43",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'ball'"
+        },
+        {
+          "id": "44",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة العراق"
+        },
+        {
+          "id": "45",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الحيوان الذي يُعرف بملك الغابة"
+        },
+        {
+          "id": "46",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : إِنَّ الْأَبْرَارَ لَفِي نَعِيمٍ"
+        },
+        {
+          "id": "47",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم السورة التي تُسمى قلب القرآن"
+        },
+        {
+          "id": "48",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد أصابع القدمين"
+        },
+        {
+          "id": "49",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الرقم التالي في السلسلة: 2، 4، 6، 8، ___؟"
+        },
+        {
+          "id": "50",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة الأردن"
+        },
+        {
+          "id": "51",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة كوريا الجنوبية"
+        },
+        {
+          "id": "52",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الحيوان الذي يطير ولا يملك ريشًا"
+        },
+        {
+          "id": "53",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'table'"
+        },
+        {
+          "id": "54",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أكبر قارة في العالم"
+        },
+        {
+          "id": "55",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'phone'"
+        },
+        {
+          "id": "56",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : فَإِذَا جَاءَتِ الطَّامَّةُ الْكُبْرَىٰ"
+        },
+        {
+          "id": "57",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'door'"
+        },
+        {
+          "id": "58",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد ألوان قوس قزح"
+        },
+        {
+          "id": "59",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم الكوكب المعروف بالحلقات"
+        },
+        {
+          "id": "60",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الحيوان الذي لا يصدر صوتاً"
+        },
+        {
+          "id": "61",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الشيء الذي يسمع بلا أذن ويتكلم بلا لسان"
+        },
+        {
+          "id": "62",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي نأكل منه ولا يؤكل"
+        },
+        {
+          "id": "63",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : كَلَّا إِذَا دُكَّتِ الْأَرْضُ دَكًّا دَكًّا"
+        },
+        {
+          "id": "64",
+          "before": null,
+          "after": 1,
+          "question": "كم عدد الصلوات المفروضة"
+        },
+        {
+          "id": "65",
+          "before": null,
+          "after": 1,
+          "question": "إذا كان أحمد أطول من سليم، وسليم أطول من هاني، من الأقصر؟"
+        },
+        {
+          "id": "66",
+          "before": null,
+          "after": 1,
+          "question": "ما الرقم التالي في التسلسل: 5، 10، 15،"
+        },
+        {
+          "id": "67",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الكوكب الأحمر"
+        },
+        {
+          "id": "68",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد قارات العالم"
+        },
+        {
+          "id": "69",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد الأسنان الدائمة عند الإنسان"
+        },
+        {
+          "id": "70",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم المادة الصلبة التي تخرج من البراكين"
+        },
+        {
+          "id": "71",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أصغر كوكب في المجموعة الشمسية"
+        },
+        {
+          "id": "72",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الشيء الذي يكبر كلما أخذت منه"
+        },
+        {
+          "id": "73",
+          "before": null,
+          "after": 1,
+          "question": "اين وردت الآية : أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ"
+        },
+        {
+          "id": "74",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أطول عظمة في جسم الإنسان"
+        },
+        {
+          "id": "75",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد أرجل العنكبوت"
+        },
+        {
+          "id": "76",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد الكواكب في المجموعة الشمسية"
+        },
+        {
+          "id": "77",
+          "before": null,
+          "after": 1,
+          "question": "ما عدد شهور السنة"
+        },
+        {
+          "id": "78",
+          "before": null,
+          "after": 2,
+          "question": "من هو الصحابي الذي دعا له النبي بالحكمة"
+        },
+        {
+          "id": "79",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي كان يعمل نجارًا"
+        },
+        {
+          "id": "80",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'bicycle'"
+        },
+        {
+          "id": "81",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة باكستان"
+        },
+        {
+          "id": "82",
+          "before": null,
+          "after": 2,
+          "question": "ما معنى كلمة 'engineer'"
+        },
+        {
+          "id": "83",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'car'"
+        },
+        {
+          "id": "84",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : وَاللَّيْلِ إِذَا يَغْشَىٰ"
+        },
+        {
+          "id": "85",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'school'"
+        },
+        {
+          "id": "86",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'computer'"
+        },
+        {
+          "id": "87",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'water'"
+        },
+        {
+          "id": "88",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الرقم الذي إذا ضربته بنفسه يعطي نفس الناتج؟"
+        },
+        {
+          "id": "89",
+          "before": null,
+          "after": 3,
+          "question": "من هو أول من جهر بالقرآن في مكة"
+        },
+        {
+          "id": "90",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة أستراليا"
+        },
+        {
+          "id": "91",
+          "before": null,
+          "after": 1,
+          "question": "من هو خليل الله"
+        },
+        {
+          "id": "92",
+          "before": null,
+          "after": 2,
+          "question": "من هو الصحابي الملقب بسيف الله"
+        },
+        {
+          "id": "93",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة الصين"
+        },
+        {
+          "id": "94",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 9 × 4"
+        },
+        {
+          "id": "95",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "96",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : إِنَّا أَنْزَلْنَاهُ فِي لَيْلَةِ الْقَدْرِ"
+        },
+        {
+          "id": "97",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "98",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "99",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من ركب الخيل"
+        },
+        {
+          "id": "100",
+          "before": null,
+          "after": 2,
+          "question": "ما الحيوان الذي يعيش في القطب الشمالي"
+        },
+        {
+          "id": "101",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "102",
+          "before": null,
+          "after": 1,
+          "question": "من هو الصحابي الذي كان مؤذن النبي"
+        },
+        {
+          "id": "103",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة النرويج"
+        },
+        {
+          "id": "104",
+          "before": null,
+          "after": 1,
+          "question": "من هو أول من نزل عليه القرآن"
+        },
+        {
+          "id": "105",
+          "before": null,
+          "after": 2,
+          "question": "من هو الصحابي الذي كان يكتب الوحي"
+        },
+        {
+          "id": "106",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 100 ÷ 4"
+        },
+        {
+          "id": "108",
+          "before": null,
+          "after": 1,
+          "question": "من هو أول الخلفاء الراشدين"
+        },
+        {
+          "id": "109",
+          "before": null,
+          "after": 2,
+          "question": "ما الحيوان الذي يعيش في القطب الجنوبي"
+        },
+        {
+          "id": "110",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي أُرسل إلى قوم عاد"
+        },
+        {
+          "id": "111",
+          "before": null,
+          "after": 2,
+          "question": "كم شهر في السنة فيه 28 يوم؟"
+        },
+        {
+          "id": "112",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة روسيا"
+        },
+        {
+          "id": "113",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "114",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة إندونيسيا"
+        },
+        {
+          "id": "115",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "116",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي عاش 950 سنة"
+        },
+        {
+          "id": "117",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "118",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'pen'"
+        },
+        {
+          "id": "119",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : وَجُوهٌ يَوْمَئِذٍ نَاعِمَةٌ"
+        },
+        {
+          "id": "120",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من قال سبحان ربي الأعلى"
+        },
+        {
+          "id": "121",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة تركيا"
+        },
+        {
+          "id": "122",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة كندا"
+        },
+        {
+          "id": "123",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 18 ÷ 6"
+        },
+        {
+          "id": "124",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة الإمارات"
+        },
+        {
+          "id": "125",
+          "before": null,
+          "after": 1,
+          "question": "ما ناتج 6 + 7"
+        },
+        {
+          "id": "126",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'house'"
+        },
+        {
+          "id": "127",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'airplane'"
+        },
+        {
+          "id": "128",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'schoolbag'"
+        },
+        {
+          "id": "129",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من لبس السروال"
+        },
+        {
+          "id": "130",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي رُفع إلى السماء"
+        },
+        {
+          "id": "131",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة الجزائر"
+        },
+        {
+          "id": "132",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة الهند"
+        },
+        {
+          "id": "133",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : فَأَمَّا مَنْ أُوتِيَ كِتَابَهُ بِيَمِينِهِ"
+        },
+        {
+          "id": "134",
+          "before": null,
+          "after": 1,
+          "question": "ما ناتج 15 × 2"
+        },
+        {
+          "id": "135",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي فُدي بذبح عظيم"
+        },
+        {
+          "id": "136",
+          "before": null,
+          "after": 2,
+          "question": "ما الحيوان الذي يسمى بأسد البحر"
+        },
+        {
+          "id": "137",
+          "before": null,
+          "after": 2,
+          "question": "إذا كان القطار يتحرك الساعة 6 صباحًا لمدة ساعتين ونصف، متى يصل؟"
+        },
+        {
+          "id": "138",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من بنى الكعبة"
+        },
+        {
+          "id": "139",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 12 ÷ 3"
+        },
+        {
+          "id": "140",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي بنى السفينة"
+        },
+        {
+          "id": "141",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة السودان"
+        },
+        {
+          "id": "142",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي كلمه الله"
+        },
+        {
+          "id": "143",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 100 - 25"
+        },
+        {
+          "id": "144",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة فلسطين"
+        },
+        {
+          "id": "145",
+          "before": null,
+          "after": 1,
+          "question": "اين وردت الآية : إِنَّ الْإِنسَانَ لِرَبِّهِ لَكَنُودٌ"
+        },
+        {
+          "id": "146",
+          "before": null,
+          "after": 1,
+          "question": "كم ضلعًا للمربع"
+        },
+        {
+          "id": "147",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من آمن من الصبيان"
+        },
+        {
+          "id": "148",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة إيطاليا"
+        },
+        {
+          "id": "149",
+          "before": null,
+          "after": 2,
+          "question": "من هو الصحابي الملقب بالفاروق"
+        },
+        {
+          "id": "150",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 11 + 9"
+        },
+        {
+          "id": "151",
+          "before": null,
+          "after": 1,
+          "question": "من هو النبي الذي ابتلعه الحوت"
+        },
+        {
+          "id": "152",
+          "before": null,
+          "after": 1,
+          "question": "ما عاصمة مصر"
+        },
+        {
+          "id": "153",
+          "before": null,
+          "after": 2,
+          "question": "من هو أطول نهر في العالم"
+        },
+        {
+          "id": "154",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 6 × 4"
+        },
+        {
+          "id": "155",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة فرنسا"
+        },
+        {
+          "id": "156",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : وَلَيَالٍ عَشْرٍ"
+        },
+        {
+          "id": "157",
+          "before": null,
+          "after": 1,
+          "question": "من هو خاتم الأنبياء"
+        },
+        {
+          "id": "158",
+          "before": null,
+          "after": 1,
+          "question": "ما هو الرقم المفقود: 3، 6، 9، ___، 15؟"
+        },
+        {
+          "id": "159",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 30 ÷ 5"
+        },
+        {
+          "id": "160",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة المغرب"
+        },
+        {
+          "id": "161",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من خط بالقلم"
+        },
+        {
+          "id": "162",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "163",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 50 ÷ 5"
+        },
+        {
+          "id": "164",
+          "before": null,
+          "after": 2,
+          "question": "ما علم هذه الدولة"
+        },
+        {
+          "id": "165",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من كتب التاريخ الهجري"
+        },
+        {
+          "id": "166",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : إِنَّ الْإِنسَانَ خُلِقَ هَلُوعًا"
+        },
+        {
+          "id": "167",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة تونس"
+        },
+        {
+          "id": "168",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من أسلم من النساء"
+        },
+        {
+          "id": "169",
+          "before": null,
+          "after": 1,
+          "question": "ما ناتج 8 × 6"
+        },
+        {
+          "id": "170",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 7 × 7"
+        },
+        {
+          "id": "171",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة سوريا"
+        },
+        {
+          "id": "172",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي أُمر بذبح ابنه"
+        },
+        {
+          "id": "173",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة قطر"
+        },
+        {
+          "id": "174",
+          "before": null,
+          "after": 2,
+          "question": "من هو النبي الذي صام عن الكلام"
+        },
+        {
+          "id": "175",
+          "before": null,
+          "after": 1,
+          "question": "من هو النبي الذي عاش في بطن الحوت"
+        },
+        {
+          "id": "176",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة ليبيا"
+        },
+        {
+          "id": "177",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : أَرَأَيْتَ إِنْ كَذَّبَ وَتَوَلَّى"
+        },
+        {
+          "id": "178",
+          "before": null,
+          "after": 2,
+          "question": "من هو أول من نطق بالعربية"
+        },
+        {
+          "id": "179",
+          "before": null,
+          "after": 1,
+          "question": "من هو النبي الذي أُعطي معجزة العصا"
+        },
+        {
+          "id": "180",
+          "before": null,
+          "after": 2,
+          "question": "ما عاصمة اليمن"
+        },
+        {
+          "id": "181",
+          "before": null,
+          "after": 2,
+          "question": "لديك 3 صناديق وعليها ملصقات خاطئة، كم مرة تحتاج لتفتح لتعرف؟"
+        },
+        {
+          "id": "182",
+          "before": null,
+          "after": 1,
+          "question": "ما الحيوان الذي يُستخدم في السباقات"
+        },
+        {
+          "id": "183",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'hospital'"
+        },
+        {
+          "id": "184",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'library'"
+        },
+        {
+          "id": "185",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'mouse'"
+        },
+        {
+          "id": "186",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'window'"
+        },
+        {
+          "id": "187",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم الطبقة الغازية التي تحيط بالأرض"
+        },
+        {
+          "id": "188",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد فقرات رقبة الزرافة"
+        },
+        {
+          "id": "189",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : إِنَّ سَعْيَكُمْ لَشَتَّى"
+        },
+        {
+          "id": "190",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم الطبقة الداخلية من الأرض"
+        },
+        {
+          "id": "191",
+          "before": null,
+          "after": 1,
+          "question": "ما هو العنصر الذي يتنفسه الإنسان"
+        },
+        {
+          "id": "192",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الحيوان الذي له ثلاثة قلوب"
+        },
+        {
+          "id": "193",
+          "before": null,
+          "after": 2,
+          "question": "ما هو العنصر الأساسي في الماس"
+        },
+        {
+          "id": "194",
+          "before": null,
+          "after": 1,
+          "question": "ما اسم العضو المسؤول عن التنفس"
+        },
+        {
+          "id": "195",
+          "before": null,
+          "after": 1,
+          "question": "ما هو العضو المسؤول عن ضخ الدم"
+        },
+        {
+          "id": "196",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد الأسنان اللبنية عند الأطفال"
+        },
+        {
+          "id": "197",
+          "before": null,
+          "after": 1,
+          "question": "ما اسم الجهاز الذي يقيس درجة الحرارة"
+        },
+        {
+          "id": "198",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم العملية التي يستخدمها النبات لصنع الغذاء"
+        },
+        {
+          "id": "199",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد عيون النحلة"
+        },
+        {
+          "id": "200",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : كَلَّا إِذَا بَلَغَتِ التَّرَاقِيَ"
+        },
+        {
+          "id": "201",
+          "before": null,
+          "after": 2,
+          "question": "ما هو أكبر محيط في العالم"
+        },
+        {
+          "id": "202",
+          "before": null,
+          "after": 2,
+          "question": "ما هو الغاز المستخدم في إطفاء الحريق"
+        },
+        {
+          "id": "203",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم البحر الذي يفصل بين السعودية والسودان"
+        },
+        {
+          "id": "204",
+          "before": null,
+          "after": 1,
+          "question": "زيدان عمره نصف عمر احمد، إذا كان عمر احمد 20، كم عمر زيدان؟"
+        },
+        {
+          "id": "205",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم الجهاز الذي يساعد على الرؤية في الظلام"
+        },
+        {
+          "id": "206",
+          "before": null,
+          "after": 2,
+          "question": "ما هو أسرع مخلوق بحري"
+        },
+        {
+          "id": "207",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم أصغر عظمة في جسم الإنسان"
+        },
+        {
+          "id": "208",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 72 ÷ 8"
+        },
+        {
+          "id": "209",
+          "before": null,
+          "after": 1,
+          "question": "كم ناتج 45 ÷ 9"
+        },
+        {
+          "id": "210",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'market'"
+        },
+        {
+          "id": "211",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'student'"
+        },
+        {
+          "id": "212",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : وَالشَّمْسِ وَضُحَاهَا"
+        },
+        {
+          "id": "213",
+          "before": null,
+          "after": 1,
+          "question": "من أول من قال \"سبحان ربي الأعلى\"؟"
+        },
+        {
+          "id": "214",
+          "before": null,
+          "after": 2,
+          "question": "لأي دولة هذا العلم الذي يحتوي على تنين؟"
+        },
+        {
+          "id": "215",
+          "before": null,
+          "after": 2,
+          "question": "من هو الصحابي الملقب بذي النورين؟"
+        },
+        {
+          "id": "216",
+          "before": null,
+          "after": 2,
+          "question": "ما الدولة التي فيها أكبر عدد من الجبال؟"
+        },
+        {
+          "id": "217",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'kitchen'"
+        },
+        {
+          "id": "218",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'desk'"
+        },
+        {
+          "id": "219",
+          "before": null,
+          "after": 2,
+          "question": "اين وردت الآية : اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ"
+        },
+        {
+          "id": "220",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'notebook'"
+        },
+        {
+          "id": "221",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'milk'"
+        },
+        {
+          "id": "222",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'bookstore'"
+        },
+        {
+          "id": "223",
+          "before": null,
+          "after": 3,
+          "question": "اين وردت الآية : كَلَّا لَئِنْ لَمْ يَنْتَهِ لَنَسْفَعًا بِالنَّاصِيَةِ"
+        },
+        {
+          "id": "224",
+          "before": null,
+          "after": 1,
+          "question": "ما معنى كلمة 'train'"
+        },
+        {
+          "id": "225",
+          "before": null,
+          "after": 3,
+          "question": "كم مرة ذكر النبي موسى في القرآن؟"
+        },
+        {
+          "id": "226",
+          "before": null,
+          "after": 3,
+          "question": "ما السورة التي تسمى \"سورة الحواريين\"؟"
+        },
+        {
+          "id": "227",
+          "before": null,
+          "after": 2,
+          "question": "ما العنصر الذي يسبب الدموع عند تقطيع البصل؟"
+        },
+        {
+          "id": "228",
+          "before": null,
+          "after": 2,
+          "question": "ما اسم المعركة التي شارك فيها جميع الصحابة البدريين؟"
+        },
+        {
+          "id": "229",
+          "before": null,
+          "after": 3,
+          "question": "كم عدد الملائكة الذين يحملون العرش؟"
+        },
+        {
+          "id": "230",
+          "before": null,
+          "after": 2,
+          "question": "ما آخر آية نزلت من القرآن؟"
+        },
+        {
+          "id": "231",
+          "before": null,
+          "after": 2,
+          "question": "إلى أي دولة أوروبية ينتمي هذا العلم؟"
+        },
+        {
+          "id": "232",
+          "before": null,
+          "after": 2,
+          "question": "لماذا يظهر القمر بأحجام مختلفة؟"
+        },
+        {
+          "id": "233",
+          "before": null,
+          "after": 2,
+          "question": "أين توجد \"جزيرة الماعز\" التي تعيش فيها الماعز على الأشجار؟"
+        },
+        {
+          "id": "234",
+          "before": null,
+          "after": 2,
+          "question": "كم يستغرق وصول ضوء الشمس للأرض؟"
+        },
+        {
+          "id": "235",
+          "before": null,
+          "after": 2,
+          "question": "ما الحيوان الذي يبكي عند الأكل؟"
+        },
+        {
+          "id": "236",
+          "before": null,
+          "after": 2,
+          "question": "أين يوجد \"باب الجحيم\" المحترق منذ 50 سنة؟"
+        },
+        {
+          "id": "237",
+          "before": null,
+          "after": 2,
+          "question": "ما الكوكب الذي يمطر ألماساً؟"
+        },
+        {
+          "id": "238",
+          "before": null,
+          "after": 2,
+          "question": "ما الكلمة التي تنطقها جميع اللغات بنفس اللفظ؟"
+        },
+        {
+          "id": "239",
+          "before": null,
+          "after": 2,
+          "question": "ما العضو الوحيد الذي يعود للنمو إذا قُطع جزء منه؟"
+        },
+        {
+          "id": "240",
+          "before": null,
+          "after": 2,
+          "question": "من هو \"ملك الألوان\" في التاريخ؟"
+        },
+        {
+          "id": "241",
+          "before": null,
+          "after": 2,
+          "question": "ما اللوحة الأغلى التي سُرقت مرتين؟"
+        },
+        {
+          "id": "242",
+          "before": null,
+          "after": 2,
+          "question": "ما أول شيء بيع عبر الإنترنت؟"
+        },
+        {
+          "id": "243",
+          "before": null,
+          "after": 2,
+          "question": "كم عدد الأنبياء المذكورين في القرآن؟"
+        },
+        {
+          "id": "244",
+          "before": null,
+          "after": 3,
+          "question": "من الصحابي الذي اهتز عرش الرحمن لموته؟"
+        },
+        {
+          "id": "245",
+          "before": null,
+          "after": 2,
+          "question": "ما هي لغة البرمجة التي كتب بها نظام \"أندرويد\"؟"
+        },
+        {
+          "id": "246",
+          "before": null,
+          "after": 2,
+          "question": "ما هو العضو الذي يستهلك 40% من أكسجين الجسم؟"
+        },
+        {
+          "id": "247",
+          "before": null,
+          "after": 2,
+          "question": "من الملك الفرعوني الذي حكم وهو في التاسعة؟"
+        },
+        {
+          "id": "248",
+          "before": null,
+          "after": 2,
+          "question": "ما الكائن الذي يعيش بعد قطع رأسه 9 أيام؟"
+        },
+        {
+          "id": "249",
+          "before": null,
+          "after": 2,
+          "question": "من كتب رواية \"اللص والكلاب\"؟"
+        },
+        {
+          "id": "250",
+          "before": null,
+          "after": 3,
+          "question": "ما السورة التي تسمى \"الفاضحة\"؟"
+        },
+        {
+          "id": "251",
+          "before": null,
+          "after": 2,
+          "question": "ما العنصر الذي اكتشفه العرب وأسموه \"الزئبق\"؟"
+        },
+        {
+          "id": "252",
+          "before": null,
+          "after": 3,
+          "question": "ما أول معركة بحرية في الإسلام؟"
+        },
+        {
+          "id": "253",
+          "before": null,
+          "after": 2,
+          "question": "ما المضيق الذي يفصل بين قارتين ويصل بين بحرين؟"
+        },
+        {
+          "id": "254",
+          "before": null,
+          "after": 2,
+          "question": "ما أثقل مادة على الأرض؟"
+        },
+        {
+          "id": "255",
+          "before": null,
+          "after": 2,
+          "question": "من بنى \"سور الصين العظيم\"؟"
+        },
+        {
+          "id": "256",
+          "before": null,
+          "after": 3,
+          "question": "من مؤلف كتاب \"حي بن يقظان\"؟"
+        },
+        {
+          "id": "257",
+          "before": null,
+          "after": 3,
+          "question": "ما هو \"العدد الذهبي\"؟"
+        },
+        {
+          "id": "258",
+          "before": null,
+          "after": 2,
+          "question": "ما أقوى عضلة في جسم الإنسان؟"
+        },
+        {
+          "id": "259",
+          "before": null,
+          "after": 3,
+          "question": "ما السورة التي تسمى \"المنجية من عذاب القبر\"؟"
+        },
+        {
+          "id": "260",
+          "before": null,
+          "after": 2,
+          "question": "هذا العلم يخص أي دولة آسيوية؟"
+        }
+      ]
+    },
+    "children": {
+      "counts": {
+        "easy": 47,
+        "medium": 122,
+        "hard": 21
+      },
+      "changed": [
+        {
+          "id": "1",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو ناتج 20 ÷ 5؟"
+        },
+        {
+          "id": "4",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الشيء الذي له عين واحدة ولا يرى؟"
+        },
+        {
+          "id": "5",
+          "before": 1,
+          "after": 2,
+          "question": "من هو مخترع الهاتف؟"
+        },
+        {
+          "id": "7",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة ألمانيا؟"
+        },
+        {
+          "id": "9",
+          "before": 1,
+          "after": 2,
+          "question": "كم عدد أيام السنة؟"
+        },
+        {
+          "id": "10",
+          "before": 1,
+          "after": 2,
+          "question": "من هو أول الرسل؟"
+        },
+        {
+          "id": "11",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة الإمارات؟"
+        },
+        {
+          "id": "15",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الكوكب الأحمر؟"
+        },
+        {
+          "id": "16",
+          "before": 1,
+          "after": 2,
+          "question": "ما الرقم التالي في التسلسل: 5، 10، 15، ؟"
+        },
+        {
+          "id": "17",
+          "before": 1,
+          "after": 2,
+          "question": "ما الحيوان الذي يعيش في الماء وله 8 أرجل؟"
+        },
+        {
+          "id": "21",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الحيوان الذي ينام وعيناه مفتوحتان؟"
+        },
+        {
+          "id": "23",
+          "before": 1,
+          "after": 2,
+          "question": "كم عدد قارات العالم؟"
+        },
+        {
+          "id": "24",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة فرنسا؟"
+        },
+        {
+          "id": "25",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الشيء الذي نأكل منه ولا يؤكل؟"
+        },
+        {
+          "id": "26",
+          "before": 1,
+          "after": 2,
+          "question": "كم ناتج 6 × 4؟"
+        },
+        {
+          "id": "27",
+          "before": 1,
+          "after": 2,
+          "question": "من هو أطول نهر في العالم؟"
+        },
+        {
+          "id": "29",
+          "before": 1,
+          "after": 2,
+          "question": "كم عدد الأسنان الدائمة عند الإنسان؟"
+        },
+        {
+          "id": "31",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الحيوان الذي لا يصدر صوتاً؟"
+        },
+        {
+          "id": "36",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الشيء الذي يسمع بلا أذن ويتكلم بلا لسان؟"
+        },
+        {
+          "id": "38",
+          "before": 1,
+          "after": 2,
+          "question": "من هو الصحابي الملقب بالفاروق؟"
+        },
+        {
+          "id": "39",
+          "before": 1,
+          "after": 2,
+          "question": "كم عدد أرجل العنكبوت؟"
+        },
+        {
+          "id": "40",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة إيطاليا؟"
+        },
+        {
+          "id": "41",
+          "before": 1,
+          "after": 2,
+          "question": "ما اسم أصغر كوكب في المجموعة الشمسية؟"
+        },
+        {
+          "id": "43",
+          "before": 1,
+          "after": 2,
+          "question": "من هو أول من آمن من الصبيان؟"
+        },
+        {
+          "id": "45",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة فلسطين؟"
+        },
+        {
+          "id": "46",
+          "before": 1,
+          "after": 2,
+          "question": "كم ناتج 100 - 25؟"
+        },
+        {
+          "id": "47",
+          "before": 1,
+          "after": 2,
+          "question": "ما هو الشيء الذي يكبر كلما أخذت منه؟"
+        },
+        {
+          "id": "49",
+          "before": 1,
+          "after": 2,
+          "question": "من هو النبي الذي كلمه الله؟"
+        },
+        {
+          "id": "51",
+          "before": 1,
+          "after": 2,
+          "question": "كم عدد ألوان قوس قزح؟"
+        },
+        {
+          "id": "52",
+          "before": 1,
+          "after": 2,
+          "question": "ما عاصمة السودان؟"
+        },
+        {
+          "id": "54",
+          "before": 1,
+          "after": 2,
+          "question": "من هو النبي الذي بنى السفينة؟"
+        },
+        {
+          "id": "55",
+          "before": 1,
+          "after": 2,
+          "question": "كم ناتج 12 ÷ 3؟"
+        },
+        {
+          "id": "57",
+          "before": 1,
+          "after": 2,
+          "question": "ما اسم عاصمة لبنان؟"
+        },
+        {
+          "id": "59",
+          "before": 1,
+          "after": 2,
+          "question": "من هو أول من بنى الكعبة؟"
+        },
+        {
+          "id": "60",
+          "before": 1,
+          "after": 2,
+          "question": "ما الحيوان الذي يسمى بأسد البحر؟"
+        },
+        {
+          "id": "62",
+          "before": 2,
+          "after": 1,
+          "question": "ما معنى كلمة 'fish'؟"
+        },
+        {
+          "id": "67",
+          "before": 2,
+          "after": 1,
+          "question": "ما معنى كلمة 'door'؟"
+        },
+        {
+          "id": "69",
+          "before": 2,
+          "after": 1,
+          "question": "ما هو العنصر الذي يتنفسه الإنسان؟"
+        },
+        {
+          "id": "70",
+          "before": 2,
+          "after": 1,
+          "question": "كم ناتج 9 + 11؟"
+        },
+        {
+          "id": "72",
+          "before": 2,
+          "after": 1,
+          "question": "ما معنى كلمة 'house'؟"
+        },
+        {
+          "id": "81",
+          "before": 2,
+          "after": 1,
+          "question": "من هو النبي الذي عاش في بطن الحوت؟"
+        },
+        {
+          "id": "82",
+          "before": 2,
+          "after": 1,
+          "question": "كم عدد أصابع اليد الواحدة؟"
+        },
+        {
+          "id": "87",
+          "before": 2,
+          "after": 3,
+          "question": "كم عدد قلوب الأخطبوط؟"
+        },
+        {
+          "id": "89",
+          "before": 2,
+          "after": 1,
+          "question": "ما هي المادة التي تُستخدم في الكتابة على السبورة؟"
+        },
+        {
+          "id": "92",
+          "before": 2,
+          "after": 1,
+          "question": "ما معنى كلمة 'pen'؟"
+        },
+        {
+          "id": "98",
+          "before": 2,
+          "after": 3,
+          "question": "من هو أول من كتب التاريخ الهجري؟"
+        },
+        {
+          "id": "100",
+          "before": 2,
+          "after": 1,
+          "question": "كم ناتج 50 ÷ 5؟"
+        },
+        {
+          "id": "104",
+          "before": 2,
+          "after": 3,
+          "question": "كم عدد عيون النحلة؟"
+        },
+        {
+          "id": "106",
+          "before": 2,
+          "after": 1,
+          "question": "ما معنى كلمة 'window'؟"
+        },
+        {
+          "id": "110",
+          "before": 2,
+          "after": 1,
+          "question": "ما الحيوان الذي يُستخدم في السباقات؟"
+        },
+        {
+          "id": "111",
+          "before": 2,
+          "after": 1,
+          "question": "ما اسم الجهاز الذي يقيس درجة الحرارة؟"
+        },
+        {
+          "id": "114",
+          "before": 2,
+          "after": 1,
+          "question": "ما ناتج 6 + 7؟"
+        },
+        {
+          "id": "119",
+          "before": 2,
+          "after": 1,
+          "question": "ما هو العضو المسؤول عن التذوق؟"
+        },
+        {
+          "id": "123",
+          "before": 2,
+          "after": 3,
+          "question": "من هو الصحابي الملقب بسيف الله؟"
+        },
+        {
+          "id": "125",
+          "before": 2,
+          "after": 3,
+          "question": "ما اسم العملية التي يستخدمها النبات لصنع الغذاء؟"
+        },
+        {
+          "id": "127",
+          "before": 2,
+          "after": 3,
+          "question": "من هو أول من جهر بالقرآن في مكة؟"
+        },
+        {
+          "id": "132",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'train'؟"
+        },
+        {
+          "id": "133",
+          "before": 3,
+          "after": 2,
+          "question": "من هو النبي الذي كان يعمل نجارًا؟"
+        },
+        {
+          "id": "134",
+          "before": 3,
+          "after": 1,
+          "question": "ما اسم الجهاز الذي يلتقط الصور؟"
+        },
+        {
+          "id": "135",
+          "before": 3,
+          "after": 1,
+          "question": "ما عدد شهور السنة؟"
+        },
+        {
+          "id": "136",
+          "before": 3,
+          "after": 2,
+          "question": "من هو أول من ركب الخيل؟"
+        },
+        {
+          "id": "137",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'kitchen'؟"
+        },
+        {
+          "id": "138",
+          "before": 3,
+          "after": 2,
+          "question": "ما الحيوان الذي يعيش في القطب الجنوبي؟"
+        },
+        {
+          "id": "139",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم أكبر قارة في العالم؟"
+        },
+        {
+          "id": "142",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'phone'؟"
+        },
+        {
+          "id": "143",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم الجهاز الذي يساعد على الرؤية في الظلام؟"
+        },
+        {
+          "id": "144",
+          "before": 3,
+          "after": 1,
+          "question": "ما عدد ساعات اليوم؟"
+        },
+        {
+          "id": "146",
+          "before": 3,
+          "after": 2,
+          "question": "ما هو الحيوان الذي يُعرف بملك الغابة؟"
+        },
+        {
+          "id": "147",
+          "before": 3,
+          "after": 1,
+          "question": "ما معنى كلمة 'ball'؟"
+        },
+        {
+          "id": "148",
+          "before": 3,
+          "after": 2,
+          "question": "من هو النبي الذي أُرسل إلى قوم عاد؟"
+        },
+        {
+          "id": "149",
+          "before": 3,
+          "after": 2,
+          "question": "ما هو الشيء الذي لا يمشي إلا بالضرب؟"
+        },
+        {
+          "id": "150",
+          "before": 3,
+          "after": 2,
+          "question": "كم ناتج 100 ÷ 4؟"
+        },
+        {
+          "id": "151",
+          "before": 3,
+          "after": 2,
+          "question": "ما عاصمة الأردن؟"
+        },
+        {
+          "id": "152",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'table'؟"
+        },
+        {
+          "id": "153",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم أول مسجد في الإسلام؟"
+        },
+        {
+          "id": "155",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم الطبقة الداخلية من الأرض؟"
+        },
+        {
+          "id": "156",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'airplane'؟"
+        },
+        {
+          "id": "157",
+          "before": 3,
+          "after": 2,
+          "question": "من هو الصحابي الذي كان مؤذن النبي؟"
+        },
+        {
+          "id": "158",
+          "before": 3,
+          "after": 2,
+          "question": "ما هو الحيوان الذي له ثلاثة قلوب؟"
+        },
+        {
+          "id": "159",
+          "before": 3,
+          "after": 2,
+          "question": "كم عدد الأسنان اللبنية عند الأطفال؟"
+        },
+        {
+          "id": "161",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'schoolbag'؟"
+        },
+        {
+          "id": "164",
+          "before": 3,
+          "after": 2,
+          "question": "كم ناتج 18 ÷ 6؟"
+        },
+        {
+          "id": "166",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'desk'؟"
+        },
+        {
+          "id": "167",
+          "before": 3,
+          "after": 2,
+          "question": "من هو النبي الذي عاش 950 سنة؟"
+        },
+        {
+          "id": "168",
+          "before": 3,
+          "after": 1,
+          "question": "ما اسم العضو المسؤول عن التنفس؟"
+        },
+        {
+          "id": "170",
+          "before": 3,
+          "after": 2,
+          "question": "كم ناتج 45 ÷ 9؟"
+        },
+        {
+          "id": "172",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'blackboard'؟"
+        },
+        {
+          "id": "173",
+          "before": 3,
+          "after": 2,
+          "question": "من هو خليل الله؟"
+        },
+        {
+          "id": "174",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم الكوكب الأزرق؟"
+        },
+        {
+          "id": "176",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'market'؟"
+        },
+        {
+          "id": "178",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم المادة الصلبة التي تخرج من البراكين؟"
+        },
+        {
+          "id": "179",
+          "before": 3,
+          "after": 2,
+          "question": "كم عدد الكواكب في المجموعة الشمسية؟"
+        },
+        {
+          "id": "181",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'hospital'؟"
+        },
+        {
+          "id": "182",
+          "before": 3,
+          "after": 2,
+          "question": "من هو الصحابي الذي كان يكتب الوحي؟"
+        },
+        {
+          "id": "183",
+          "before": 3,
+          "after": 1,
+          "question": "ما اسم الحاسة التي تستخدمها الأذن؟"
+        },
+        {
+          "id": "184",
+          "before": 3,
+          "after": 2,
+          "question": "ما الحيوان الذي يعيش في القطب الشمالي؟"
+        },
+        {
+          "id": "186",
+          "before": 3,
+          "after": 2,
+          "question": "ما معنى كلمة 'engineer'؟"
+        },
+        {
+          "id": "187",
+          "before": 3,
+          "after": 2,
+          "question": "من هو أول من نزل عليه القرآن؟"
+        },
+        {
+          "id": "188",
+          "before": 3,
+          "after": 2,
+          "question": "ما اسم الكوكب الذي يدور حوله قمر واحد؟"
+        },
+        {
+          "id": "189",
+          "before": 3,
+          "after": 1,
+          "question": "ما هو العضو المسؤول عن الرؤية؟"
+        },
+        {
+          "id": "190",
+          "before": 3,
+          "after": 2,
+          "question": "ما عاصمة روسيا؟"
+        }
+      ]
+    }
+  }
+}

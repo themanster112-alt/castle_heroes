@@ -191,6 +191,7 @@ class WarriorSetupCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
+        const Text('الصغار: حتى 12 سنة • الكبار: من 13 سنة'),
         Wrap(
           spacing: 10,
           runSpacing: 10,

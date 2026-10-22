@@ -14,7 +14,8 @@ for (let age = 0; age < names.length; age++) {
   const bank = JSON.parse(content).sort((a, b) => Number(a.questionNumber ?? a.id) - Number(b.questionNumber ?? b.id));
   bank.forEach((item, index) => {
     if (item.options.length !== 3 || ![0, 1, 2].includes(item.correctOptionIndex)) throw new Error('Invalid question options');
-    const level = item.level == null ? Math.min(3, Math.floor(index * 3 / bank.length) + 1) : Math.max(1, Math.min(3, Number(item.level)));
+    if (![1, 2, 3].includes(item.level)) throw new Error(`Explicit reviewed difficulty required: ${names[age]}/${item.id}`);
+    const level = item.level;
     rows.push({key: `${age}_${item.id}`, age, level, text: normalized(item.question), answer: item.correctOptionIndex});
     counts[age][fields[level - 1]]++;
   });
