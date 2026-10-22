@@ -71,6 +71,7 @@ flutter:
     - assets/helpers/
     - assets/question/
     - assets/backgrounds/question_map.png
+    - assets/backgrounds/solo_question_map.jpg
     - assets/backgrounds/player_setup.png
     - assets/audio/menu_click.m4a
     - assets/audio/timer_tick.wav

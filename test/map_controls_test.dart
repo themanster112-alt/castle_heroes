@@ -20,7 +20,7 @@ RaceMatch match() => RaceMatch(
 );
 
 void main() {
-  for (final width in [320.0, 900.0]) {
+  for (final width in [288.0, 320.0, 900.0]) {
     testWidgets('Solo map has one unobstructed trail at width $width', (
       tester,
     ) async {
@@ -46,9 +46,20 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('solo-map')), findsOneWidget);
+      final image = tester.widget<Image>(
+        find.byKey(const ValueKey('solo-map')),
+      );
+      expect(
+        (image.image as AssetImage).assetName,
+        'assets/backgrounds/solo_question_map.jpg',
+      );
       expect(find.byKey(const ValueKey('stone-1-1')), findsNothing);
       final board = tester.getRect(find.byType(RaceBoard));
       final controls = tester.getRect(find.byType(DifficultyPicker));
+      final score = tester.getRect(
+        find.byKey(const ValueKey('player-helpers-0')),
+      );
+      expect(find.text('المحارب • 0 نقطة'), findsOneWidget);
       expect(board.contains(controls.topLeft), isTrue);
       expect(board.contains(controls.bottomRight), isTrue);
       for (var step = 1; step <= RaceMatch.stationCount; step++) {
@@ -56,12 +67,17 @@ void main() {
         final expected = RaceBoard.position(0, step.toDouble(), solo: true);
         expect(
           stone.left,
-          closeTo(board.left + expected.dx * board.width - 13, .01),
+          closeTo(board.left + expected.dx * board.width - 16, .01),
         );
         expect(
           stone.overlaps(controls),
           isFalse,
-          reason: 'Station $step must remain visible',
+          reason: 'Station $step ($stone) must remain clear of $controls',
+        );
+        expect(
+          stone.overlaps(score),
+          isFalse,
+          reason: 'Score must not cover station $step',
         );
       }
       await tester.ensureVisible(find.byKey(const ValueKey('difficulty-1')));

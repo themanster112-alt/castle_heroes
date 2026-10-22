@@ -798,6 +798,7 @@ class DifficultyPicker extends StatelessWidget {
   final bool enabled;
   final ValueChanged<int> onSelected;
   final bool compact;
+  final bool horizontal;
 
   const DifficultyPicker({
     super.key,
@@ -805,6 +806,7 @@ class DifficultyPicker extends StatelessWidget {
     required this.onSelected,
     this.enabled = true,
     this.compact = false,
+    this.horizontal = false,
   });
 
   @override
@@ -876,64 +878,69 @@ class DifficultyPicker extends StatelessWidget {
       border: Border.all(color: raceGold),
       boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 12)],
     ),
-    child: Column(
+    child: Flex(
+      direction: horizontal ? Axis.horizontal : Axis.vertical,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
-          'اختر المستوى',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: raceGold, fontSize: 12),
-        ),
+        if (!horizontal)
+          const Text(
+            'اختر المستوى',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: raceGold, fontSize: 12),
+          ),
         for (var level = 1; level <= 3; level++)
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Tooltip(
-              message:
-                  game.stoneLockReason(game.stoneForLevel(level)) ??
-                  '${level * 10} نقطة',
-              child: OutlinedButton(
-                key: ValueKey('difficulty-$level'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 54),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 3,
-                    vertical: 7,
-                  ),
-                  foregroundColor: raceGold,
-                  disabledForegroundColor: Colors.white60,
-                  backgroundColor: const Color(0xF2203042),
-                ),
-                onPressed:
-                    enabled && game.canChooseStone(game.stoneForLevel(level))
-                    ? () => onSelected(level)
-                    : null,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      ['سهل', 'متوسط', 'صعب'][level - 1],
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      !game.levelUnlocked(level)
-                          ? level == 2
-                                ? 'سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
-                                : 'متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
-                          : game.available(level).isEmpty
-                          ? 'نفدت الأسئلة'
-                          : '${level * 10} نقطة',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  ],
-                ),
+          horizontal
+              ? Expanded(child: _compactButton(level))
+              : _compactButton(level),
+      ],
+    ),
+  );
+
+  Widget _compactButton(int level) => Padding(
+    padding: horizontal
+        ? const EdgeInsets.symmetric(horizontal: 2)
+        : const EdgeInsets.only(top: 5),
+    child: Tooltip(
+      message:
+          game.stoneLockReason(game.stoneForLevel(level)) ??
+          '${level * 10} نقطة',
+      child: OutlinedButton(
+        key: ValueKey('difficulty-$level'),
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 54),
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 7),
+          foregroundColor: raceGold,
+          disabledForegroundColor: Colors.white60,
+          backgroundColor: const Color(0xF2203042),
+        ),
+        onPressed: enabled && game.canChooseStone(game.stoneForLevel(level))
+            ? () => onSelected(level)
+            : null,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              ['سهل', 'متوسط', 'صعب'][level - 1],
+              style: TextStyle(
+                fontSize: horizontal ? 14 : 17,
+                height: horizontal ? 1.1 : null,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-      ],
+            Text(
+              !game.levelUnlocked(level)
+                  ? level == 2
+                        ? 'سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
+                        : 'متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
+                  : game.available(level).isEmpty
+                  ? 'نفدت الأسئلة'
+                  : '${level * 10} نقطة',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 10, height: horizontal ? 1.1 : null),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 }
@@ -972,7 +979,9 @@ class RaceArena extends StatelessWidget {
                 Expanded(
                   child: PlayerHelpers(
                     key: ValueKey('player-helpers-$lane'),
-                    name: names[lane],
+                    name: names.length == 1
+                        ? '${names[lane]} • ${game.scores[lane]} نقطة'
+                        : names[lane],
                     blue: lane == 0,
                     unlocked: game.unlocked[lane],
                     lootUnlocked: game.scores[lane] >= 50,
@@ -1006,6 +1015,7 @@ class RaceArena extends StatelessWidget {
               game: game,
               enabled: enabled,
               compact: true,
+              horizontal: names.length == 1,
               onSelected: onLevel,
             ),
           ),
@@ -1130,7 +1140,7 @@ class RaceBoard extends StatelessWidget {
   ];
   static Offset position(int lane, double step, {bool solo = false}) {
     final points = solo
-        ? SoloMapPainter.platforms
+        ? SoloMap.platforms
         : lane == 0
         ? leftPlatforms
         : rightPlatforms;
@@ -1143,7 +1153,7 @@ class RaceBoard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 938 / 1677,
+    aspectRatio: names.length == 1 ? SoloMap.aspectRatio : 938 / 1677,
     child: ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: LayoutBuilder(
@@ -1155,9 +1165,11 @@ class RaceBoard extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: solo
-                    ? const CustomPaint(
+                    ? Image.asset(
+                        SoloMap.asset,
                         key: ValueKey('solo-map'),
-                        painter: SoloMapPainter(),
+                        fit: BoxFit.fill,
+                        excludeFromSemantics: true,
                       )
                     : Image.asset(
                         'assets/backgrounds/question_map.png',
@@ -1170,10 +1182,10 @@ class RaceBoard extends StatelessWidget {
                   Positioned(
                     left:
                         boardPosition(lane, n.toDouble()).dx * box.maxWidth -
-                        13,
+                        (solo ? 16 : 13),
                     top:
                         boardPosition(lane, n.toDouble()).dy * box.maxHeight -
-                        13,
+                        (solo ? 16 : 13),
                     child: GestureDetector(
                       key: ValueKey('stone-$lane-$n'),
                       onTap: lane == active && onStone != null
@@ -1294,40 +1306,40 @@ class RaceBoard extends StatelessWidget {
                       );
                     },
                   ),
-                Positioned(
-                  bottom: 12,
-                  left: solo
-                      ? box.maxWidth * .075
-                      : lane == 0
-                      ? 8
-                      : box.maxWidth * .52,
-                  width: box.maxWidth * (solo ? .85 : .46),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xDC10192E),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: active == lane ? raceGold : Colors.white24,
+                if (!solo)
+                  Positioned(
+                    bottom: 12,
+                    left: lane == 0 ? 8 : box.maxWidth * .52,
+                    width: box.maxWidth * .46,
+                    child: Container(
+                      key: ValueKey('map-score-$lane'),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xDC10192E),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: active == lane ? raceGold : Colors.white24,
+                        ),
+                      ),
+                      child: Text(
+                        '${names[lane]} • ${scores?[lane] ?? 0} نقطة',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    child: Text(
-                      '${names[lane]} • ${scores?[lane] ?? 0} نقطة',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
                   ),
-                ),
               ],
               if (controls != null)
                 Positioned.fill(
                   key: const ValueKey('map-difficulty-controls'),
                   child: Align(
-                    alignment: Alignment(solo ? .85 : 0, .05),
+                    alignment: Alignment(0, solo ? -.96 : .05),
                     child: SizedBox(
-                      width: min(box.maxWidth * (solo ? .42 : .34), 180),
+                      width: solo
+                          ? box.maxWidth * .94
+                          : min(box.maxWidth * .34, 180),
                       child: controls!,
                     ),
                   ),

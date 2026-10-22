@@ -55,3 +55,13 @@ One-player games now use a separate, vector-painted landscape with one winding t
 Validation: all 50 Flutter tests passed and Flutter analysis is clean. Added narrow/wide solo checks at 130% text scale: every station is on the dedicated trail, controls stay inside the map and do not cover any station, and easy selection still works. Reviewed a rendered 390px solo preview locally.
 
 The release web build succeeded and Firebase Hosting is deployed with the solo map.
+
+## Supplied solo artwork
+
+Replaced the procedural solo landscape with the user's supplied JPEG, copied unchanged to assets/backgrounds/solo_question_map.jpg. SoloMap stores its native aspect ratio (1536/2752) and fourteen measured stone centers from the bottom-right starting platform to the castle. Station labels, hero movement and score animations use these coordinates. Solo difficulty choices now form a horizontal row inside the image's sky, leaving the bridge and all stations visible. Solo name/score appear in the helper heading instead of an overlay covering the bottom stone. Two-player map placement is preserved.
+
+Reviewed a decoded-image preview at 390px; all fourteen labels align with the illustrated platforms. Original and copied JPEG SHA-256 hashes match. Geometry checks now include a 288px map, representing a 320px phone with page padding, alongside 320px and 900px maps at 130% text scale. They assert the supplied asset is used, no second lane exists, controls stay inside the image and no station is covered, and easy selection works.
+
+All 51 Flutter tests passed and Flutter analysis is clean.
+
+The web release build succeeded and hosting is deployed. Verified the hosted main.dart.js and supplied solo JPEG match the tested build byte for byte. No bank, rules or protocol changes.
