@@ -670,8 +670,8 @@ void main() {
     ))!;
     expect(children.offline, isTrue);
     expect(adults.offline, isTrue);
-    expect(children.questions.length, 190);
-    expect(adults.questions.length, 280);
+    expect(children.questions.length, 220);
+    expect(adults.questions.length, 310);
     expect(children.questions.every((q) => q.options.length == 3), isTrue);
     expect(adults.questions.any((q) => q.id == '107'), isFalse);
   });
