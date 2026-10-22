@@ -9,6 +9,7 @@ import 'question_scroll.dart';
 import 'menu_audio.dart';
 import 'castle_character.dart';
 import 'helper_announcement.dart';
+import 'solo_map.dart';
 
 const raceGold = Color(0xFFE9BD66);
 
@@ -1127,8 +1128,12 @@ class RaceBoard extends StatelessWidget {
     Offset(.677, .229),
     Offset(.604, .198),
   ];
-  static Offset position(int lane, double step) {
-    final points = lane == 0 ? leftPlatforms : rightPlatforms;
+  static Offset position(int lane, double step, {bool solo = false}) {
+    final points = solo
+        ? SoloMapPainter.platforms
+        : lane == 0
+        ? leftPlatforms
+        : rightPlatforms;
     final progress = step.clamp(0.0, RaceMatch.stationCount.toDouble());
     final index = progress.floor();
     final start = index == 0 ? Offset(points.first.dx, .95) : points[index - 1];
@@ -1143,20 +1148,32 @@ class RaceBoard extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: LayoutBuilder(
         builder: (context, box) {
+          final solo = names.length == 1;
+          Offset boardPosition(int lane, double step) =>
+              position(lane, step, solo: solo);
           return Stack(
             children: [
               Positioned.fill(
-                child: Image.asset(
-                  'assets/backgrounds/question_map.png',
-                  fit: BoxFit.fill,
-                  excludeFromSemantics: true,
-                ),
+                child: solo
+                    ? const CustomPaint(
+                        key: ValueKey('solo-map'),
+                        painter: SoloMapPainter(),
+                      )
+                    : Image.asset(
+                        'assets/backgrounds/question_map.png',
+                        fit: BoxFit.fill,
+                        excludeFromSemantics: true,
+                      ),
               ),
               for (var lane = 0; lane < names.length; lane++) ...[
                 for (var n = 1; n <= RaceMatch.stationCount; n++)
                   Positioned(
-                    left: position(lane, n.toDouble()).dx * box.maxWidth - 13,
-                    top: position(lane, n.toDouble()).dy * box.maxHeight - 13,
+                    left:
+                        boardPosition(lane, n.toDouble()).dx * box.maxWidth -
+                        13,
+                    top:
+                        boardPosition(lane, n.toDouble()).dy * box.maxHeight -
+                        13,
                     child: GestureDetector(
                       key: ValueKey('stone-$lane-$n'),
                       onTap: lane == active && onStone != null
@@ -1207,7 +1224,7 @@ class RaceBoard extends StatelessWidget {
                     final delta =
                         (scores?[lane] ?? 0) -
                         (previousScores?[lane] ?? scores?[lane] ?? 0);
-                    final point = position(lane, step);
+                    final point = boardPosition(lane, step);
                     return Positioned(
                       left: point.dx * box.maxWidth - 25,
                       top:
@@ -1257,7 +1274,7 @@ class RaceBoard extends StatelessWidget {
                     tween: Tween(begin: 0, end: 1),
                     duration: const Duration(milliseconds: 1500),
                     builder: (context, progress, _) {
-                      final point = position(lane, steps[lane].toDouble());
+                      final point = boardPosition(lane, steps[lane].toDouble());
                       return Positioned(
                         left: point.dx * box.maxWidth - 35,
                         top: point.dy * box.maxHeight - 70 - progress * 30,
@@ -1279,8 +1296,12 @@ class RaceBoard extends StatelessWidget {
                   ),
                 Positioned(
                   bottom: 12,
-                  left: lane == 0 ? 8 : box.maxWidth * .52,
-                  width: box.maxWidth * .46,
+                  left: solo
+                      ? box.maxWidth * .075
+                      : lane == 0
+                      ? 8
+                      : box.maxWidth * .52,
+                  width: box.maxWidth * (solo ? .85 : .46),
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -1304,9 +1325,9 @@ class RaceBoard extends StatelessWidget {
                 Positioned.fill(
                   key: const ValueKey('map-difficulty-controls'),
                   child: Align(
-                    alignment: const Alignment(0, .05),
+                    alignment: Alignment(solo ? .85 : 0, .05),
                     child: SizedBox(
-                      width: min(box.maxWidth * .34, 180),
+                      width: min(box.maxWidth * (solo ? .42 : .34), 180),
                       child: controls!,
                     ),
                   ),

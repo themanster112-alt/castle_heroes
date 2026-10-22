@@ -47,3 +47,11 @@ Local and online selection now share RaceArena: easy/medium/hard buttons sit in 
 Validation: all 48 Flutter tests passed, Flutter analysis is clean, and the release web build succeeded. New geometry checks cover 320px and 900px screens at 130% text scale and require the difficulty buttons to stay inside the map and helper text to stay inside complete cards. A separate interaction check verifies first-tap cannon activation. No bank, rules or protocol changes.
 
 Hosting is deployed. Two successful production checks at a 390px mobile viewport verified room creation/join, per-player difficulty locks, synchronized easy-question selection, immediate offline departure and eventual remote closure. Screenshots confirmed the map controls and complete helper text fit. Large artwork was not yet visible at capture time; direct hosting checks returned the expected PNG bytes for the map and cannon. An intermediate repeat timed out on a blank page before startup; a fresh-profile repeat with a 90-second initial-load allowance passed. The underlying cold-load delay was not established. Browser profiles and anonymous test accounts were cleaned up. Public bank/catalog checks also passed for all 530 questions.
+
+## Dedicated solo map
+
+One-player games now use a separate, vector-painted landscape with one winding trail and a castle destination. SoloMapPainter.platforms supplies all fourteen station coordinates for both the painted trail and animated progress, including floating score gains. Difficulty controls sit beside the trail; the single player's score card spans the bottom. Two-player games retain their existing map and two paths. No scoring, question-bank, protocol or rule changes.
+
+Validation: all 50 Flutter tests passed and Flutter analysis is clean. Added narrow/wide solo checks at 130% text scale: every station is on the dedicated trail, controls stay inside the map and do not cover any station, and easy selection still works. Reviewed a rendered 390px solo preview locally.
+
+The release web build succeeded and Firebase Hosting is deployed with the solo map.

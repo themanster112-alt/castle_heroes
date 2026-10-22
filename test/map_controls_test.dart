@@ -20,6 +20,57 @@ RaceMatch match() => RaceMatch(
 );
 
 void main() {
+  for (final width in [320.0, 900.0]) {
+    testWidgets('Solo map has one unobstructed trail at width $width', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(Size(width, 1100));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      var chosen = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: MediaQuery(
+                data: MediaQueryData(textScaler: const TextScaler.linear(1.3)),
+                child: RaceArena(
+                  game: match(),
+                  names: const ['المحارب'],
+                  onLevel: (level) => chosen = level,
+                  onCannon: (_) {},
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('solo-map')), findsOneWidget);
+      expect(find.byKey(const ValueKey('stone-1-1')), findsNothing);
+      final board = tester.getRect(find.byType(RaceBoard));
+      final controls = tester.getRect(find.byType(DifficultyPicker));
+      expect(board.contains(controls.topLeft), isTrue);
+      expect(board.contains(controls.bottomRight), isTrue);
+      for (var step = 1; step <= RaceMatch.stationCount; step++) {
+        final stone = tester.getRect(find.byKey(ValueKey('stone-0-$step')));
+        final expected = RaceBoard.position(0, step.toDouble(), solo: true);
+        expect(
+          stone.left,
+          closeTo(board.left + expected.dx * board.width - 13, .01),
+        );
+        expect(
+          stone.overlaps(controls),
+          isFalse,
+          reason: 'Station $step must remain visible',
+        );
+      }
+      await tester.ensureVisible(find.byKey(const ValueKey('difficulty-1')));
+      await tester.tap(find.byKey(const ValueKey('difficulty-1')));
+      expect(chosen, 1);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   for (final size in [const Size(320, 740), const Size(900, 900)]) {
     testWidgets('Map choices and complete helper cards fit $size', (
       tester,
