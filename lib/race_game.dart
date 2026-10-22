@@ -744,67 +744,28 @@ class _CastleRaceScreenState extends State<CastleRaceScreen> {
                               ),
                             ),
                           ),
-                        DifficultyPicker(
+                        RaceArena(
                           game: game,
-                          onSelected: (level) => setState(() {
+                          names: widget.names,
+                          characters: widget.characters,
+                          previousSteps: previousSteps,
+                          previousScores: previousScores,
+                          onLevel: (level) => setState(() {
                             previousSteps = List.of(game.steps);
                             previousScores = List.of(game.scores);
                             game.chooseStone(game.stoneForLevel(level));
                           }),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'تقدّم اللاعبين نحو القلعة',
-                          textAlign: TextAlign.center,
-                        ),
-                        Stack(
-                          children: [
-                            RaceBoard(
-                              names: widget.names,
-                              characters: widget.characters,
-                              steps: game.steps,
-                              scores: game.scores,
-                              previousSteps: previousSteps,
-                              previousScores: previousScores,
-                              active: game.team,
-                            ),
-                            for (
-                              var lane = 0;
-                              lane < widget.names.length;
-                              lane++
-                            )
-                              Positioned(
-                                top: 12,
-                                left: lane == 0 ? 4 : null,
-                                right: lane == 0 ? null : 4,
-                                child: _PlayerHelpers(
-                                  name: widget.names[lane],
-                                  blue: lane == 0,
-                                  unlocked: game.unlocked[lane],
-                                  lootUnlocked: game.scores[lane] >= 50,
-                                  cannonUsed: game.cannonUsed[lane],
-                                  lootUsed: game.lootUsed[lane],
-                                  armed: game.team == lane && game.cannonArmed,
-                                  lootAvailable: widget.names.length > 1,
-                                  onCannon:
-                                      game.team == lane &&
-                                          game.unlocked[lane] &&
-                                          !game.cannonUsed[lane]
-                                      ? () {
-                                          if (!game.armCannon()) return;
-                                          setState(() {});
-                                          showHelperAnnouncement(
-                                            context,
-                                            player: widget.names[lane],
-                                            helper: 'القذيفة المضاعفة',
-                                            asset:
-                                                'assets/helpers/cannon_${lane == 0 ? 'blue' : 'red'}.png',
-                                          );
-                                        }
-                                      : null,
-                                ),
-                              ),
-                          ],
+                          onCannon: (lane) {
+                            if (!game.armCannon()) return;
+                            setState(() {});
+                            showHelperAnnouncement(
+                              context,
+                              player: widget.names[lane],
+                              helper: 'القذيفة المضاعفة',
+                              asset:
+                                  'assets/helpers/cannon_${lane == 0 ? 'blue' : 'red'}.png',
+                            );
+                          },
                         ),
                         const SizedBox(height: 16),
                         if (!game.hasPlayableQuestion) ...[
@@ -835,68 +796,221 @@ class DifficultyPicker extends StatelessWidget {
   final RaceMatch game;
   final bool enabled;
   final ValueChanged<int> onSelected;
+  final bool compact;
 
   const DifficultyPicker({
     super.key,
     required this.game,
     required this.onSelected,
     this.enabled = true,
+    this.compact = false,
   });
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      for (var level = 1; level <= 3; level++)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: OutlinedButton(
-            key: ValueKey('difficulty-$level'),
-            onPressed: enabled && game.canChooseStone(game.stoneForLevel(level))
-                ? () => onSelected(level)
-                : null,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                children: [
-                  Icon(
-                    game.levelUnlocked(level) ? Icons.quiz : Icons.lock_outline,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => compact
+      ? _compactPicker()
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var level = 1; level <= 3; level++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: OutlinedButton(
+                  key: ValueKey('difficulty-$level'),
+                  onPressed:
+                      enabled && game.canChooseStone(game.stoneForLevel(level))
+                      ? () => onSelected(level)
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
                       children: [
-                        Text(
-                          level == 1
-                              ? 'سهل'
-                              : level == 2
-                              ? 'متوسط'
-                              : 'صعب',
-                          style: const TextStyle(fontSize: 22),
+                        Icon(
+                          game.levelUnlocked(level)
+                              ? Icons.quiz
+                              : Icons.lock_outline,
                         ),
-                        Text(
-                          !game.levelUnlocked(level)
-                              ? level == 2
-                                    ? 'لفتح المتوسط: سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
-                                    : 'لفتح الصعب: متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
-                              : game.available(level).isEmpty
-                              ? 'انتهت أسئلة هذا المستوى'
-                              : '${level * 10} نقطة • سؤال عشوائي',
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                level == 1
+                                    ? 'سهل'
+                                    : level == 2
+                                    ? 'متوسط'
+                                    : 'صعب',
+                                style: const TextStyle(fontSize: 22),
+                              ),
+                              Text(
+                                !game.levelUnlocked(level)
+                                    ? level == 2
+                                          ? 'لفتح المتوسط: سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
+                                          : 'لفتح الصعب: متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
+                                    : game.available(level).isEmpty
+                                    ? 'انتهت أسئلة هذا المستوى'
+                                    : '${level * 10} نقطة • سؤال عشوائي',
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
+              ),
+            const Text(
+              'ابدأ بالسهل؛ بعد إجابة سهلة يُفتح المتوسط، وبعد ثلاث إجابات متوسطة يُفتح الصعب. لكل لاعب تقدّمه الخاص.',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        );
+
+  Widget _compactPicker() => Container(
+    padding: const EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      color: const Color(0xED10192E),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: raceGold),
+      boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 12)],
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'اختر المستوى',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: raceGold, fontSize: 12),
+        ),
+        for (var level = 1; level <= 3; level++)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Tooltip(
+              message:
+                  game.stoneLockReason(game.stoneForLevel(level)) ??
+                  '${level * 10} نقطة',
+              child: OutlinedButton(
+                key: ValueKey('difficulty-$level'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 54),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 3,
+                    vertical: 7,
+                  ),
+                  foregroundColor: raceGold,
+                  disabledForegroundColor: Colors.white60,
+                  backgroundColor: const Color(0xF2203042),
+                ),
+                onPressed:
+                    enabled && game.canChooseStone(game.stoneForLevel(level))
+                    ? () => onSelected(level)
+                    : null,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      ['سهل', 'متوسط', 'صعب'][level - 1],
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      !game.levelUnlocked(level)
+                          ? level == 2
+                                ? 'سهل ${game.answeredCounts[game.team][0].clamp(0, 1)}/1'
+                                : 'متوسط ${game.answeredCounts[game.team][1].clamp(0, 3)}/3'
+                          : game.available(level).isEmpty
+                          ? 'نفدت الأسئلة'
+                          : '${level * 10} نقطة',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      const Text(
-        'ابدأ بالسهل؛ بعد إجابة سهلة يُفتح المتوسط، وبعد ثلاث إجابات متوسطة يُفتح الصعب. لكل لاعب تقدّمه الخاص.',
-        textAlign: TextAlign.center,
+      ],
+    ),
+  );
+}
+
+class RaceArena extends StatelessWidget {
+  final RaceMatch game;
+  final List<String> names;
+  final List<CastleCharacter>? characters;
+  final List<int>? previousSteps, previousScores;
+  final bool enabled;
+  final ValueChanged<int> onLevel;
+  final ValueChanged<int> onCannon;
+  const RaceArena({
+    super.key,
+    required this.game,
+    required this.names,
+    this.characters,
+    this.previousSteps,
+    this.previousScores,
+    this.enabled = true,
+    required this.onLevel,
+    required this.onCannon,
+  });
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 560),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var lane = 0; lane < names.length; lane++) ...[
+                if (lane > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: PlayerHelpers(
+                    key: ValueKey('player-helpers-$lane'),
+                    name: names[lane],
+                    blue: lane == 0,
+                    unlocked: game.unlocked[lane],
+                    lootUnlocked: game.scores[lane] >= 50,
+                    cannonUsed: game.cannonUsed[lane],
+                    lootUsed: game.lootUsed[lane],
+                    armed: game.team == lane && game.cannonArmed,
+                    lootAvailable: names.length > 1,
+                    onCannon:
+                        enabled &&
+                            game.team == lane &&
+                            game.unlocked[lane] &&
+                            !game.cannonUsed[lane] &&
+                            !game.cannonArmed
+                        ? () => onCannon(lane)
+                        : null,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          RaceBoard(
+            names: names,
+            steps: game.steps,
+            scores: game.scores,
+            previousSteps: previousSteps,
+            previousScores: previousScores,
+            active: game.team,
+            characters: characters,
+            controls: DifficultyPicker(
+              game: game,
+              enabled: enabled,
+              compact: true,
+              onSelected: onLevel,
+            ),
+          ),
+        ],
       ),
-    ],
+    ),
   );
 }
 
@@ -958,6 +1072,7 @@ class RaceSummary extends StatelessWidget {
 }
 
 class RaceBoard extends StatelessWidget {
+  final Widget? controls;
   final List<String> names;
   final List<int> steps;
   final List<int>? scores;
@@ -968,6 +1083,7 @@ class RaceBoard extends StatelessWidget {
   final List<CastleCharacter>? characters;
   const RaceBoard({
     super.key,
+    this.controls,
     required this.names,
     required this.steps,
     this.scores,
@@ -1184,6 +1300,17 @@ class RaceBoard extends StatelessWidget {
                   ),
                 ),
               ],
+              if (controls != null)
+                Positioned.fill(
+                  key: const ValueKey('map-difficulty-controls'),
+                  child: Align(
+                    alignment: const Alignment(0, .05),
+                    child: SizedBox(
+                      width: min(box.maxWidth * .34, 180),
+                      child: controls!,
+                    ),
+                  ),
+                ),
             ],
           );
         },
@@ -1192,7 +1319,7 @@ class RaceBoard extends StatelessWidget {
   );
 }
 
-class _PlayerHelpers extends StatefulWidget {
+class PlayerHelpers extends StatelessWidget {
   final String name;
   final bool blue,
       unlocked,
@@ -1202,7 +1329,8 @@ class _PlayerHelpers extends StatefulWidget {
       armed,
       lootAvailable;
   final VoidCallback? onCannon;
-  const _PlayerHelpers({
+  const PlayerHelpers({
+    super.key,
     required this.name,
     required this.blue,
     required this.unlocked,
@@ -1215,49 +1343,30 @@ class _PlayerHelpers extends StatefulWidget {
   });
 
   @override
-  State<_PlayerHelpers> createState() => _PlayerHelpersState();
-}
-
-class _PlayerHelpersState extends State<_PlayerHelpers> {
-  bool expanded = false;
-  String get name => widget.name;
-  bool get blue => widget.blue;
-  bool get unlocked => widget.unlocked;
-  bool get cannonUsed => widget.cannonUsed;
-  bool get lootUsed => widget.lootUsed;
-  bool get armed => widget.armed;
-  bool get lootAvailable => widget.lootAvailable;
-  VoidCallback? get onCannon => widget.onCannon;
-  @override
   Widget build(BuildContext context) {
     final color = blue ? Colors.lightBlueAccent : Colors.redAccent;
     final suffix = blue ? 'blue' : 'red';
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 250),
-      child: ClipRect(
-        child: Align(
-          alignment: blue ? Alignment.centerRight : Alignment.centerLeft,
-          widthFactor: expanded ? 1 : .5,
-          child: SizedBox(
-            width: 74,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    name,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: color, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                _helper(
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: const Color(0xED10192E),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: color, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 5),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _helper(
                   context,
                   'القذيفة المضاعفة',
                   'cannon_$suffix',
@@ -1273,25 +1382,29 @@ class _PlayerHelpersState extends State<_PlayerHelpers> {
                   unlocked && (!cannonUsed || armed),
                   onCannon,
                 ),
-                if (lootAvailable)
-                  _helper(
-                    context,
-                    'سرقة الغنيمة',
-                    'loot_$suffix',
-                    lootUsed
-                        ? 'استُخدمت'
-                        : widget.lootUnlocked
-                        ? 'جاهزة'
-                        : '50 نقطة',
-                    'تتاح عند خطأ الخصم بعد جمع 50 نقطة. أجب عن سؤاله لكسب نقاطه. استخدام واحد.',
-                    color,
-                    widget.lootUnlocked && !lootUsed,
-                    null,
-                  ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: _helper(
+                  context,
+                  'سرقة الغنيمة',
+                  'loot_$suffix',
+                  !lootAvailable
+                      ? 'تحتاج خصمًا'
+                      : lootUsed
+                      ? 'استُخدمت'
+                      : lootUnlocked
+                      ? 'جاهزة'
+                      : '50 نقطة',
+                  !lootAvailable ? 'سرقة الغنيمة متاحة في تحدي لاعبين فقط.' : 'تتاح عند خطأ الخصم بعد جمع 50 نقطة. أجب عن سؤاله لكسب نقاطه. استخدام واحد.',
+                  color,
+                  lootAvailable && lootUnlocked && !lootUsed,
+                  null,
+                ),
+              ),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -1305,70 +1418,66 @@ class _PlayerHelpersState extends State<_PlayerHelpers> {
     Color color,
     bool available,
     VoidCallback? action,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 6),
-      child: Semantics(
-        label: '$name، $title، $status',
-        button: true,
-        child: Tooltip(
-          message: '$title: $description',
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: !expanded
-                ? () => setState(() => expanded = true)
-                : action ??
-                      () => showDialog<void>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('$title • $status'),
-                          content: Text(description),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('حسنًا'),
-                            ),
-                          ],
-                        ),
-                      ),
-            child: Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: const Color(0xCB10192E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: available ? color : Colors.white24),
-              ),
-              child: Column(
-                children: [
-                  Opacity(
-                    opacity: available ? 1 : .4,
-                    child: Image.asset(
-                      'assets/helpers/$asset.png',
-                      width: 62,
-                      height: 62,
-                      fit: BoxFit.contain,
-                      excludeFromSemantics: true,
-                    ),
-                  ),
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, fontSize: 11),
-                  ),
-                  Text(
-                    status,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: available ? color : Colors.white60,
-                      fontSize: 11,
-                    ),
+  ) => Semantics(
+    label: '$name، $title، $status',
+    button: true,
+    child: Tooltip(
+      message: '$title: $description',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(9),
+        onTap:
+            action ??
+            () => showDialog<void>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('$title • $status'),
+                content: Text(description),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('حسنًا'),
                   ),
                 ],
               ),
             ),
+        child: Container(
+          key: ValueKey('helper-$asset'),
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
+          decoration: BoxDecoration(
+            color: const Color(0xCC243044),
+            borderRadius: BorderRadius.circular(9),
+            border: Border.all(color: available ? color : Colors.white24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Opacity(
+                opacity: available ? 1 : .5,
+                child: Image.asset(
+                  'assets/helpers/$asset.png',
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.contain,
+                  excludeFromSemantics: true,
+                ),
+              ),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 11),
+              ),
+              Text(
+                status,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: available ? color : Colors.white70,
+                  fontSize: 11,
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 }

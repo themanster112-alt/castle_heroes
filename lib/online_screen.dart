@@ -515,28 +515,14 @@ class _OnlineRoomScreenState extends State<OnlineRoomScreen> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 24),
           ),
-          DifficultyPicker(
+          RaceArena(
             game: game,
-            enabled: myTurn,
-            onSelected: (level) => _send('choose', game.stoneForLevel(level)),
-          ),
-          const SizedBox(height: 16),
-          const Text('تقدّم اللاعبين نحو القلعة', textAlign: TextAlign.center),
-          RaceBoard(
             names: names,
             characters: characters,
-            steps: game.steps,
-            scores: game.scores,
-            active: game.team,
+            enabled: myTurn,
+            onLevel: (level) => _send('choose', game.stoneForLevel(level)),
+            onCannon: (_) => _send('cannon'),
           ),
-          if (game.cannonArmed)
-            const Text('القذيفة مفعّلة ×2', textAlign: TextAlign.center),
-          if (myTurn && game.unlocked[game.team] && !game.cannonUsed[game.team])
-            FilledButton.icon(
-              onPressed: () => _send('cannon'),
-              icon: const Icon(Icons.local_fire_department),
-              label: const Text('القذيفة المضاعفة'),
-            ),
           if (myTurn && !game.hasPlayableQuestion)
             FilledButton(
               onPressed: () => _send('skip'),

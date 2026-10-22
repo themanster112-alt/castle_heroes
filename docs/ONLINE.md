@@ -6,6 +6,8 @@ Firebase project: `castle-heroes-online-20261021` (separate from the question-ba
 
 Question selection uses three difficulty buttons: easy, medium and hard. Medium opens after one easy answer, and hard after three medium answers, separately for each player. Answer counts include submitted wrong answers; timeouts do not count. The stones show score progress only and cannot be tapped. Protocol 3 keeps the command/state format and uses a fixed 20-second timer for questions and loot.
 
+Difficulty buttons sit in the center of the map. Each player's cannon and loot cards remain fully visible above the map, including names and availability. A ready cannon activates on the first tap; locked and used helpers remain visible with their status. Local and online games share this layout.
+
 Open **تحدي 1×1 → اللعب أونلاين**. Choose **فتح غرفة**, enter your own name, age and character, and share the five-digit code. The other player chooses **الدخول إلى غرفة**, enters their own profile and the code. Both devices start automatically after the room is claimed. No account registration is required; Firebase signs each device in anonymously.
 
 Codes expire after 30 minutes while waiting. Active rooms last up to three hours. Each stone-selection turn allows 60 seconds; if it expires, the other player wins for non-response. Activating the cannon does not restart that timer. Either connected participant can advance an expired question/result or claim the expired selection turn.

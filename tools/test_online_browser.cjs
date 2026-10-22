@@ -40,7 +40,7 @@ class Browser {
   text() { return this.evaluate('document.body.innerText'); }
   async click(label) {
     await this.command('Page.bringToFront');
-    await this.waitFor(() => this.evaluate(`(() => {document.querySelector('flt-semantics-placeholder')?.click();const e=Array.from(document.querySelectorAll('[role=button]')).find(e=>(e.innerText||e.getAttribute('aria-label'))===${JSON.stringify(label)});if(!e)return false;e.scrollIntoView({block:'center'});e.click();return true;})()`), label);
+    await this.waitFor(() => this.evaluate(`(() => {document.querySelector('flt-semantics-placeholder')?.click();const e=Array.from(document.querySelectorAll('[role=button]')).find(e=>(e.innerText||e.getAttribute('aria-label'))===${JSON.stringify(label)});if(!e)return false;e.scrollIntoView({block:'center'});e.click();return true;})()`), label, label === 'ابدأ التحدي' ? 90000 : 30000);
     await delay(600);
   }
   async input(index, value) {
@@ -79,6 +79,9 @@ const browsers = [];
 (async () => {
   const host = await Browser.connect(8791); browsers.push(host);
   const guest = await Browser.connect(8792); browsers.push(guest);
+  for (const browser of browsers) {
+    await browser.command('Emulation.setDeviceMetricsOverride', {width: 390, height: 1000, deviceScaleFactor: 1, mobile: true});
+  }
   await host.enter(false, 'فحص الحماية');
   const code = await host.waitFor(async () => (await host.text()).match(/غرفة\s+(\d{5})/)?.[1], 'room creation', 90000);
   host.roomCode = code;
@@ -96,6 +99,9 @@ const browsers = [];
   assert.deepEqual(hostChoices.map(choice => choice.disabled), [false, true, true]);
   assert.equal(guestChoices.length, 3);
   assert.ok(guestChoices.every(choice => choice.disabled));
+  await host.evaluate(`Array.from(document.querySelectorAll('[role=button]')).find(e => (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith('سهل')).scrollIntoView({block:'center'})`);
+  await delay(4000); // Allow map/helper images to decode before the visual capture.
+  await host.screenshot('map-controls-selection');
   await host.evaluate(`(() => {const e=Array.from(document.querySelectorAll('[role=button]')).find(e => (e.innerText||e.getAttribute('aria-label')||'').trim().startsWith('سهل'));e.scrollIntoView({block:'center'});e.click();})()`);
   await host.waitFor(async () => host.evaluate(`(async()=>{const f=window.firebase_firestore,app=window.firebase_core.getApp('online');const d=(await f.getDoc(f.doc(f.getFirestore(app),'rooms',${JSON.stringify(code)}))).data();return d.phase==='answer'&&d.state.level===1&&d.phaseSeconds===20;})()`), 'easy button starts synchronized question');
   console.log('PASS difficulty buttons enforce turn and locks and start a validated easy question');

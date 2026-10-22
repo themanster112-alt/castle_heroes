@@ -829,7 +829,7 @@ void main() {
     expect(find.text('14'), findsNWidgets(2));
     final locked = find.byKey(const ValueKey('difficulty-2'));
     expect(tester.widget<OutlinedButton>(locked).onPressed, isNull);
-    expect(find.text('لفتح المتوسط: سهل 0/1'), findsOneWidget);
+    expect(find.text('سهل 0/1'), findsOneWidget);
     expect(tester.widget<RaceBoard>(find.byType(RaceBoard)).onStone, isNull);
     expect(find.byType(QuestionScrollScreen), findsNothing);
     final easy = find.byKey(const ValueKey('difficulty-1'));
